@@ -1,8 +1,10 @@
 <?php
 /**
  * @var array<int, array<string, mixed>> $bookings
+ * @var string|null                     $flash
  */
 $bookings = $bookings ?? [];
+$flash = $flash ?? null;
 
 $statuses = [
     'new' => 'Новая',
@@ -14,6 +16,10 @@ $statuses = [
 ];
 ?>
 <h1>Заявки</h1>
+
+<?php if (!empty($flash)): ?>
+    <div class="flash" role="status"><?= e((string) $flash) ?></div>
+<?php endif; ?>
 
 <?php if (empty($bookings)): ?>
     <p>Заявок пока нет</p>
@@ -61,6 +67,12 @@ $statuses = [
                             </select>
                             <button type="submit" class="btn btn-accent btn-sm">Сохранить</button>
                         </form>
+                        <?php if (empty($booking['user_id'])): ?>
+                            <form method="POST" action="<?= e(url('/admin/bookings/' . $booking['id'] . '/create-client')) ?>" class="inline-form">
+                                <?= csrf_field() ?>
+                                <button type="submit" class="btn btn-outline btn-sm">Создать клиента</button>
+                            </form>
+                        <?php endif; ?>
                     </td>
                 </tr>
             <?php endforeach; ?>

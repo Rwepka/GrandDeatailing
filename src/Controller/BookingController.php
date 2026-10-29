@@ -7,6 +7,7 @@ use App\Core\Database;
 use App\Core\View;
 use App\Model\Booking;
 use App\Model\BookingItem;
+use App\Model\RateLimit;
 use App\Model\Service;
 
 class BookingController
@@ -25,6 +26,8 @@ class BookingController
     {
         // Авторизованному пользователю подставляем его имя и телефон в квиз.
         $user = auth();
+        // Точка отсчёта для time-trap: замер времени заполнения формы.
+        $_SESSION['booking_form_time'] = time();
         View::render('booking', [
             'title' => 'Запись онлайн',
             'services' => Service::active(),
@@ -38,6 +41,30 @@ class BookingController
 
     public function store(): void
     {
+        // --- Honeypot: скрытое поле-ловушка для ботов ---
+        if (trim((string) ($_POST['website'] ?? '')) !== '') {
+            redirect('/booking/success');
+        }
+
+        // --- Time-trap: заявка не может быть заполнена быстрее 3 секунд ---
+        $formTime = (int) ($_SESSION['booking_form_time'] ?? 0);
+        if ($formTime === 0 || (time() - $formTime) < 3) {
+            redirect('/booking/success');
+        }
+
+        // --- Лимит отправок по IP ---
+        $ip = (string) ($_SERVER['REMOTE_ADDR'] ?? '0.0.0.0');
+        if (RateLimit::tooMany($ip)) {
+            View::render('booking', [
+                'title' => 'Запись онлайн',
+                'services' => Service::active(),
+                'carClasses' => self::CAR_CLASSES,
+                'errors' => ['Слишком много заявок. Попробуйте позже.'],
+                'old' => [],
+            ]);
+            return;
+        }
+
         $services = Service::active();
 
         // Исходные значения для повторного заполнения формы при ошибках.
@@ -216,6 +243,7 @@ class BookingController
             return;
         }
 
+        RateLimit::record($ip);
         redirect('/booking/success');
     }
 

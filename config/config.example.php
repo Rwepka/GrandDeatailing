@@ -17,6 +17,7 @@ return [
     ],
     'db' => [
         'host' => 'localhost',
+        'port' => '3306',
         'name' => 'grand_detailing',
         'user' => 'db_user',
         'pass' => 'db_password',

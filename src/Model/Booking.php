@@ -74,6 +74,15 @@ class Booking extends Model
     }
 
     /**
+     * Привязка заявки к учётной записи клиента.
+     */
+    public static function linkUser(int $id, int $userId): void
+    {
+        $stmt = Database::connection()->prepare('UPDATE bookings SET user_id = ? WHERE id = ?');
+        $stmt->execute([$userId, $id]);
+    }
+
+    /**
      * Количество заявок с указанным статусом.
      */
     public static function countByStatus(string $status): int

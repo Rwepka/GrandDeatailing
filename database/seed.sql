@@ -5,8 +5,6 @@
 
 SET NAMES utf8mb4;
 
-USE grand_detailing;
-
 -- Роли пользователей
 INSERT IGNORE INTO roles (code, title) VALUES
     ('client', 'Клиент'),

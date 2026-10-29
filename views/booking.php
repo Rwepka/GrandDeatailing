@@ -33,6 +33,7 @@ $oldCarClass = (string) ($old['car_class'] ?? '');
 
         <form method="POST" action="<?= e(url('/booking')) ?>" id="booking-form" novalidate>
             <?= csrf_field() ?>
+            <input type="text" name="website" value="" class="hp-field" tabindex="-1" autocomplete="off" aria-hidden="true">
 
             <ol class="booking-steps">
                 <li data-step="1" class="active"><span>1</span> Автомобиль</li>

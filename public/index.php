@@ -54,6 +54,7 @@ $router->post('/cabinet/security/password', [CabinetController::class, 'updatePa
 $router->get('/admin', [AdminController::class, 'dashboard']);
 $router->get('/admin/bookings', [AdminController::class, 'bookings']);
 $router->post('/admin/bookings/{id}/status', [AdminController::class, 'updateStatus']);
+$router->post('/admin/bookings/{id}/create-client', [AdminController::class, 'createClient']);
 $router->get('/admin/services', [AdminServiceController::class, 'index']);
 $router->get('/admin/services/create', [AdminServiceController::class, 'create']);
 $router->post('/admin/services', [AdminServiceController::class, 'store']);

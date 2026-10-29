@@ -18,6 +18,25 @@ document.addEventListener('DOMContentLoaded', () => {
         const indicators = Array.from(form.querySelectorAll('.booking-steps li'));
         let current = 0;
 
+        // Шаг валиден, только когда выбраны его обязательные поля:
+        // шаг 1 — класс автомобиля; шаг 2 — хотя бы одна услуга.
+        const isCurrentStepValid = () => {
+            if (current === 0) {
+                return form.querySelector('input[name="car_class"]:checked') !== null;
+            }
+            if (current === 1) {
+                return form.querySelectorAll('input[name="service_ids[]"]:checked').length > 0;
+            }
+            return true;
+        };
+
+        const updateNextButton = () => {
+            const nextBtn = steps[current].querySelector('[data-next]');
+            if (nextBtn) {
+                nextBtn.disabled = !isCurrentStepValid();
+            }
+        };
+
         const show = (index) => {
             steps.forEach((step, i) => { step.hidden = i !== index; });
             indicators.forEach((li, i) => {
@@ -25,6 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 li.classList.toggle('done', i < index);
             });
             current = index;
+            updateNextButton();
         };
 
         form.addEventListener('click', (e) => {
@@ -34,6 +54,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const next = current + (btn.hasAttribute('data-next') ? 1 : -1);
             if (next >= 0 && next < steps.length) show(next);
         });
+
+        form.addEventListener('change', updateNextButton);
 
         show(0);
     }
@@ -86,10 +108,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const loadDraft = () => {
             const raw = readCookie(DRAFT_COOKIE);
-            if (!raw) return;
+            if (!raw) return false;
             try {
                 const draft = JSON.parse(decodeURIComponent(raw));
-                if (!draft || typeof draft !== 'object') return;
+                if (!draft || typeof draft !== 'object') return false;
 
                 if (draft.car_class !== undefined && draft.car_class !== null) {
                     const carClass = String(draft.car_class);
@@ -111,18 +133,30 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (el) el.value = String(value);
                     }
                 };
+                // Имя и телефон берём из cookie только если учётная запись их не заполнила
+                // (приоритет — данные аккаунта).
+                const setValueIfEmpty = (selector, value) => {
+                    if (value !== undefined && value !== null) {
+                        const el = form.querySelector(selector);
+                        if (el && el.value === '') el.value = String(value);
+                    }
+                };
                 setValue('input[name="brand_model"]', draft.brand_model);
-                setValue('input[name="name"]', draft.name);
-                setValue('input[name="phone"]', draft.phone);
+                setValueIfEmpty('input[name="name"]', draft.name);
+                setValueIfEmpty('input[name="phone"]', draft.phone);
                 setValue('input[name="pref_date"]', draft.pref_date);
                 setValue('input[name="pref_time"]', draft.pref_time);
                 setValue('textarea[name="comment"]', draft.comment);
+                return true;
             } catch (e) {
                 // Повреждённая cookie — игнорируем.
+                return false;
             }
         };
 
-        loadDraft();
+        if (loadDraft()) {
+            form.dispatchEvent(new Event('change'));
+        }
 
         form.addEventListener('input', saveDraft);
         form.addEventListener('change', saveDraft);

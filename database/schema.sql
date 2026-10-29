@@ -5,12 +5,6 @@
 
 SET NAMES utf8mb4;
 
-CREATE DATABASE IF NOT EXISTS grand_detailing
-    CHARACTER SET utf8mb4
-    COLLATE utf8mb4_unicode_ci;
-
-USE grand_detailing;
-
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- ---------------------------------------------------------------------
@@ -257,5 +251,19 @@ CREATE TABLE remember_tokens (
   DEFAULT CHARACTER SET = utf8mb4
   COLLATE = utf8mb4_unicode_ci
   COMMENT = 'Токены «запомнить меня»';
+
+-- ---------------------------------------------------------------------
+-- Защита от спама: лимит отправок форм по IP
+-- ---------------------------------------------------------------------
+CREATE TABLE rate_limits (
+    id         INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    ip         VARCHAR(45)  NOT NULL,
+    created_at DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    KEY idx_rate_limits_ip_time (ip, created_at)
+) ENGINE = InnoDB
+  DEFAULT CHARACTER SET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci
+  COMMENT = 'Лимит отправок форм по IP';
 
 SET FOREIGN_KEY_CHECKS = 1;

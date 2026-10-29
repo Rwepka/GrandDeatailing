@@ -16,12 +16,11 @@ class Database
     {
         if (self::$pdo === null) {
             $db = config('db');
-            $dsn = sprintf(
-                'mysql:host=%s;dbname=%s;charset=%s',
-                $db['host'],
-                $db['name'],
-                $db['charset']
-            );
+            $dsn = 'mysql:host=' . $db['host'];
+            if (!empty($db['port'])) {
+                $dsn .= ';port=' . $db['port'];
+            }
+            $dsn .= ';dbname=' . $db['name'] . ';charset=' . $db['charset'];
             self::$pdo = new PDO($dsn, $db['user'], $db['pass'], [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,

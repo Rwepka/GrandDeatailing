@@ -6,11 +6,13 @@ namespace App\Controller;
 use App\Core\Database;
 use App\Core\View;
 use App\Model\User;
+use App\Model\RateLimit;
 
 class AuthController
 {
     public function showRegister(): void
     {
+        $_SESSION['register_form_time'] = time();
         View::render('register', [
             'title' => 'Регистрация',
             'errors' => [],
@@ -20,6 +22,28 @@ class AuthController
 
     public function register(): void
     {
+        // --- Honeypot: скрытое поле-ловушка для ботов ---
+        if (trim((string) ($_POST['website'] ?? '')) !== '') {
+            redirect('/');
+        }
+
+        // --- Time-trap: форма не может быть заполнена быстрее 3 секунд ---
+        $formTime = (int) ($_SESSION['register_form_time'] ?? 0);
+        if ($formTime === 0 || (time() - $formTime) < 3) {
+            redirect('/');
+        }
+
+        // --- Лимит отправок по IP ---
+        $ip = (string) ($_SERVER['REMOTE_ADDR'] ?? '0.0.0.0');
+        if (RateLimit::tooMany($ip)) {
+            View::render('register', [
+                'title' => 'Регистрация',
+                'errors' => ['Слишком много попыток. Попробуйте позже.'],
+                'old' => [],
+            ]);
+            return;
+        }
+
         // Исходные значения для повторного заполнения формы при ошибках.
         $old = [
             'name' => trim((string) ($_POST['name'] ?? '')),
@@ -117,6 +141,7 @@ class AuthController
             'password_hash' => password_hash($password, PASSWORD_DEFAULT),
         ]);
 
+        RateLimit::record($ip);
         login($userId);
         redirect('/cabinet');
     }

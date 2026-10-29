@@ -6,6 +6,7 @@ namespace App\Controller;
 use App\Core\Database;
 use App\Core\View;
 use App\Model\Booking;
+use App\Model\User;
 
 class AdminController
 {
@@ -40,6 +41,7 @@ class AdminController
         View::renderAdmin('bookings', [
             'title' => 'Заявки',
             'bookings' => Booking::latest(),
+            'flash' => flash(),
         ]);
     }
 
@@ -67,6 +69,67 @@ class AdminController
 
         Booking::updateStatus($id, $status);
 
+        redirect('/admin/bookings');
+    }
+
+    /**
+     * Создание учётной записи клиента из заявки (только администратор).
+     */
+    public function createClient(int $id): void
+    {
+        requireAdmin();
+
+        if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
+            redirect('/admin/bookings');
+        }
+
+        if (!csrf_verify($_POST['csrf_token'] ?? null)) {
+            http_response_code(419);
+            redirect('/admin/bookings');
+        }
+
+        $booking = Booking::find($id);
+        if ($booking === null) {
+            redirect('/admin/bookings');
+        }
+
+        if (!empty($booking['user_id'])) {
+            setFlash('У заявки уже есть клиент.');
+            redirect('/admin/bookings');
+        }
+
+        $name = trim((string) ($booking['client_name'] ?? ''));
+        $phone = normalize_phone((string) ($booking['client_phone'] ?? ''));
+
+        if ($name === '' || $phone === '') {
+            setFlash('Нельзя создать клиента: в заявке нет имени или телефона.');
+            redirect('/admin/bookings');
+        }
+
+        // Если пользователь с таким телефоном уже существует — привязываем заявку к нему.
+        $existing = User::findByPhone($phone);
+        if ($existing !== null) {
+            Booking::linkUser($id, (int) $existing['id']);
+            setFlash('Заявка привязана к существующему клиенту «' . $existing['name'] . '».');
+            redirect('/admin/bookings');
+        }
+
+        // Иначе создаём нового клиента с временным паролем.
+        $password = substr(bin2hex(random_bytes(6)), 0, 10);
+
+        $clientRoleId = (int) (Database::connection()->query("SELECT id FROM roles WHERE code = 'client'")->fetchColumn() ?: 1);
+
+        $userId = User::create([
+            'role_id' => $clientRoleId,
+            'name' => $name,
+            'email' => null,
+            'phone' => $phone,
+            'password_hash' => password_hash($password, PASSWORD_DEFAULT),
+        ]);
+
+        Booking::linkUser($id, $userId);
+
+        setFlash('Клиент создан: ' . $phone . '. Временный пароль: ' . $password . ' (сообщите клиенту).');
         redirect('/admin/bookings');
     }
 }

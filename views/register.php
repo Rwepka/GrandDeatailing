@@ -27,6 +27,7 @@ $old = $old ?? [];
 
             <form method="POST" action="<?= e(url('/register')) ?>" novalidate>
                 <?= csrf_field() ?>
+                <input type="text" name="website" value="" class="hp-field" tabindex="-1" autocomplete="off" aria-hidden="true">
 
                 <div class="field-group">
                     <label for="name">Имя</label>
