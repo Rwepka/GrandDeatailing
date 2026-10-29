@@ -25,6 +25,25 @@ class Message extends Model
     }
 
     /**
+     * Создать сообщение обратной связи.
+     *
+     * @param array{name: string, phone: string, email?: string|null, text?: string|null} $data
+     */
+    public static function create(array $data): int
+    {
+        $stmt = Database::connection()->prepare(
+            'INSERT INTO messages (name, phone, email, text) VALUES (?, ?, ?, ?)'
+        );
+        $stmt->execute([
+            $data['name'],
+            $data['phone'],
+            $data['email'] ?? null,
+            $data['text'] ?? null,
+        ]);
+        return (int) Database::connection()->lastInsertId();
+    }
+
+    /**
      * Отметить сообщение прочитанным.
      */
     public static function markRead(int $id): void

@@ -54,6 +54,132 @@ $statusLabels = [
     </div>
 </div>
 
+<h2>Доход</h2>
+
+<div class="income-panel">
+    <button type="button" class="btn btn-outline btn-sm" data-range="today">Сегодня</button>
+    <button type="button" class="btn btn-outline btn-sm" data-range="week">Неделя</button>
+    <button type="button" class="btn btn-outline btn-sm" data-range="month">Месяц</button>
+    <button type="button" class="btn btn-outline btn-sm" data-range="year">Год</button>
+    <input type="date" id="income-from">
+    <input type="date" id="income-to">
+    <button type="button" class="btn btn-outline btn-sm" data-range="custom">Показать</button>
+</div>
+
+<canvas id="income-chart" height="100"></canvas>
+<div class="income-total">Итого за выбранный период: <strong id="income-total-value">0 ₽</strong></div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+(function () {
+    'use strict';
+
+    const fromInput = document.getElementById('income-from');
+    const toInput = document.getElementById('income-to');
+    const ctx = document.getElementById('income-chart').getContext('2d');
+    let chart = null;
+
+    function pad(n) {
+        return String(n).padStart(2, '0');
+    }
+
+    function fmtDate(d) {
+        return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+    }
+
+    function rangeFor(kind) {
+        const today = new Date();
+        const from = new Date(today);
+        const to = new Date(today);
+
+        if (kind === 'today') {
+            // от сегодня до сегодня
+        } else if (kind === 'week') {
+            const mondayOffset = (today.getDay() + 6) % 7;
+            from.setDate(today.getDate() - mondayOffset);
+        } else if (kind === 'month') {
+            from.setDate(1);
+        } else if (kind === 'year') {
+            from.setMonth(0, 1);
+        }
+
+        return { from: fmtDate(from), to: fmtDate(to) };
+    }
+
+    function loadIncome(from, to) {
+        fetch('/admin/dashboard/income?from=' + encodeURIComponent(from) + '&to=' + encodeURIComponent(to))
+            .then(function (resp) {
+                if (!resp.ok) {
+                    throw new Error('HTTP ' + resp.status);
+                }
+                return resp.json();
+            })
+            .then(function (json) {
+                const byDay = {};
+                (json.data || []).forEach(function (row) {
+                    byDay[row.day] = parseFloat(row.total) || 0;
+                });
+
+                const labels = [];
+                const values = [];
+
+                const cursor = new Date(from + 'T00:00:00');
+                const end = new Date(to + 'T00:00:00');
+                while (cursor <= end) {
+                    const key = fmtDate(cursor);
+                    labels.push(pad(cursor.getDate()) + '.' + pad(cursor.getMonth() + 1));
+                    values.push(byDay[key] || 0);
+                    cursor.setDate(cursor.getDate() + 1);
+                }
+
+                const total = values.reduce(function (sum, v) { return sum + v; }, 0);
+                document.getElementById('income-total-value').textContent = total.toLocaleString('ru-RU') + ' ₽';
+
+                if (chart !== null) {
+                    chart.destroy();
+                }
+
+                chart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Доход, ₽',
+                            data: values,
+                            backgroundColor: '#1D4ED8'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: { beginAtZero: true }
+                        }
+                    }
+                });
+            })
+            .catch(function (err) {
+                console.error('Ошибка загрузки графика дохода:', err);
+            });
+    }
+
+    document.querySelectorAll('[data-range]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            const kind = btn.getAttribute('data-range');
+            const range = rangeFor(kind);
+            fromInput.value = range.from;
+            toInput.value = range.to;
+            loadIncome(range.from, range.to);
+        });
+    });
+
+    // При загрузке — месяц и заполняем поля.
+    const initial = rangeFor('month');
+    fromInput.value = initial.from;
+    toInput.value = initial.to;
+    loadIncome(initial.from, initial.to);
+})();
+</script>
+
 <h2>Последние заявки</h2>
 <?php if (empty($recentBookings)): ?>
     <p>Заявок пока нет</p>

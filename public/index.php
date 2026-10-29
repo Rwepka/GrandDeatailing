@@ -15,6 +15,8 @@ use App\Core\Router;
 use App\Controller\HomeController;
 use App\Controller\ServiceController;
 use App\Controller\BookingController;
+use App\Controller\ContactController;
+use App\Controller\ReviewController;
 use App\Controller\AuthController;
 use App\Controller\CabinetController;
 use App\Controller\AdminController;
@@ -22,6 +24,7 @@ use App\Controller\AdminServiceController;
 use App\Controller\AdminReviewController;
 use App\Controller\AdminMessageController;
 use App\Controller\AdminMasterController;
+use App\Controller\AdminClientController;
 
 $router = new Router();
 
@@ -32,6 +35,11 @@ $router->get('/services/{slug}', [ServiceController::class, 'show']);
 $router->get('/booking', [BookingController::class, 'show']);
 $router->post('/booking', [BookingController::class, 'store']);
 $router->get('/booking/success', [BookingController::class, 'success']);
+$router->get('/contacts', [ContactController::class, 'index']);
+$router->post('/contacts', [ContactController::class, 'store']);
+$router->get('/reviews', [ReviewController::class, 'index']);
+$router->get('/reviews/create', [ReviewController::class, 'create']);
+$router->post('/reviews', [ReviewController::class, 'store']);
 
 // --- Авторизация ---
 $router->get('/register', [AuthController::class, 'showRegister']);
@@ -52,9 +60,11 @@ $router->post('/cabinet/security/password', [CabinetController::class, 'updatePa
 
 // --- Админ-панель (только для администратора) ---
 $router->get('/admin', [AdminController::class, 'dashboard']);
+$router->get('/admin/dashboard/income', [AdminController::class, 'income']);
 $router->get('/admin/bookings', [AdminController::class, 'bookings']);
 $router->post('/admin/bookings/{id}/status', [AdminController::class, 'updateStatus']);
 $router->post('/admin/bookings/{id}/create-client', [AdminController::class, 'createClient']);
+$router->post('/admin/bookings/{id}/delete', [AdminController::class, 'deleteBooking']);
 $router->get('/admin/services', [AdminServiceController::class, 'index']);
 $router->get('/admin/services/create', [AdminServiceController::class, 'create']);
 $router->post('/admin/services', [AdminServiceController::class, 'store']);
@@ -68,6 +78,7 @@ $router->post('/admin/messages/{id}/read', [AdminMessageController::class, 'mark
 $router->get('/admin/masters', [AdminMasterController::class, 'index']);
 $router->get('/admin/masters/create', [AdminMasterController::class, 'create']);
 $router->post('/admin/masters', [AdminMasterController::class, 'store']);
+$router->get('/admin/clients', [AdminClientController::class, 'index']);
 
 // По мере разработки добавляются:
 //   $router->get('/login', [AuthController::class, 'showLogin']);

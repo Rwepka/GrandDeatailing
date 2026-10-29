@@ -11,6 +11,7 @@ $current = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/';
     <title><?= e($title) ?></title>
     <link rel="stylesheet" href="<?= e(asset('css/style.css')) ?>">
     <link rel="stylesheet" href="<?= e(asset('css/admin.css')) ?>">
+    <script src="<?= e(asset('js/admin.js')) ?>" defer></script>
 </head>
 <body class="admin-body">
 <div class="admin-layout">
@@ -24,6 +25,7 @@ $current = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/';
                 <a href="<?= e(url('/admin')) ?>" class="<?= $current === '/admin' ? 'active' : '' ?>">Дашборд</a>
                 <a href="<?= e(url('/admin/bookings')) ?>" class="<?= str_starts_with($current, '/admin/bookings') ? 'active' : '' ?>">Заявки</a>
                 <a href="<?= e(url('/admin/services')) ?>" class="<?= str_starts_with($current, '/admin/services') ? 'active' : '' ?>">Услуги</a>
+                <a href="<?= e(url('/admin/clients')) ?>" class="<?= str_starts_with($current, '/admin/clients') ? 'active' : '' ?>">Клиенты</a>
                 <a href="<?= e(url('/admin/masters')) ?>" class="<?= str_starts_with($current, '/admin/masters') ? 'active' : '' ?>">Мастера</a>
                 <a href="<?= e(url('/admin/reviews')) ?>" class="<?= str_starts_with($current, '/admin/reviews') ? 'active' : '' ?>">Отзывы</a>
                 <a href="<?= e(url('/admin/messages')) ?>" class="<?= str_starts_with($current, '/admin/messages') ? 'active' : '' ?>">Сообщения</a>

@@ -28,6 +28,14 @@ class BookingController
         $user = auth();
         // Точка отсчёта для time-trap: замер времени заполнения формы.
         $_SESSION['booking_form_time'] = time();
+
+        // Пришли из калькулятора — подставляем класс авто и услуги из URL.
+        $carClass = (string) ($_GET['car_class'] ?? '');
+        $serviceIds = is_array($_GET['service_ids'] ?? null)
+            ? array_map('intval', $_GET['service_ids'])
+            : [];
+        $skipToStep3 = $carClass !== '' || $serviceIds !== [];
+
         View::render('booking', [
             'title' => 'Запись онлайн',
             'services' => Service::active(),
@@ -35,7 +43,10 @@ class BookingController
             'old' => [
                 'name' => $user['name'] ?? '',
                 'phone' => $user['phone'] ?? '',
+                'car_class' => $carClass,
+                'service_ids' => $serviceIds,
             ],
+            'skipToStep3' => $skipToStep3,
         ]);
     }
 

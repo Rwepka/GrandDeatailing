@@ -11,6 +11,7 @@ $services = $services ?? [];
 $carClasses = $carClasses ?? [];
 $errors = $errors ?? [];
 $old = $old ?? [];
+$skipToStep3 = $skipToStep3 ?? false;
 
 $oldServiceIds = array_map('intval', (array) ($old['service_ids'] ?? []));
 $oldCarClass = (string) ($old['car_class'] ?? '');
@@ -31,7 +32,7 @@ $oldCarClass = (string) ($old['car_class'] ?? '');
             </div>
         <?php endif; ?>
 
-        <form method="POST" action="<?= e(url('/booking')) ?>" id="booking-form" novalidate>
+        <form method="POST" action="<?= e(url('/booking')) ?>" id="booking-form" novalidate<?= !empty($skipToStep3) ? ' data-skip-to="3"' : '' ?>>
             <?= csrf_field() ?>
             <input type="text" name="website" value="" class="hp-field" tabindex="-1" autocomplete="off" aria-hidden="true">
 

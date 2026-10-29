@@ -19,13 +19,13 @@ $current = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/';
         <div class="header-menu" id="header-menu">
             <nav class="main-nav">
                 <?php if (isMaster()): ?>
-                    <a href="#">Контакты</a>
+                    <a href="<?= e(url('/contacts')) ?>" class="<?= str_starts_with($current, '/contacts') ? 'active' : '' ?>">Контакты</a>
                 <?php else: ?>
                     <a href="<?= e(url('/')) ?>" class="<?= $current === '/' ? 'active' : '' ?>">Главная</a>
                     <a href="<?= e(url('/services')) ?>" class="<?= str_starts_with($current, '/services') ? 'active' : '' ?>">Услуги</a>
                     <a href="#">Портфолио</a>
-                    <a href="#">Отзывы</a>
-                    <a href="#">Контакты</a>
+                    <a href="<?= e(url('/reviews')) ?>" class="<?= str_starts_with($current, '/reviews') ? 'active' : '' ?>">Отзывы</a>
+                    <a href="<?= e(url('/contacts')) ?>" class="<?= str_starts_with($current, '/contacts') ? 'active' : '' ?>">Контакты</a>
                 <?php endif; ?>
             </nav>
             <div class="header-actions">

@@ -15,6 +15,8 @@ class HomeController
             redirect('/admin/bookings');
         }
 
+        $activeServices = Service::active();
+
         $services = array_map(
             static function (array $s): array {
                 return [
@@ -23,12 +25,14 @@ class HomeController
                     'price' => price($s['price_from'] === null ? null : (float) $s['price_from']),
                 ];
             },
-            Service::active()
+            $activeServices
         );
 
         View::render('home', [
             'title' => 'GRAND DETAILING — детейлинг-студия',
             'services' => $services,
+            'carClasses' => car_classes(),
+            'calculatorServices' => $activeServices,
         ]);
     }
 }

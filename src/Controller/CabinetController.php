@@ -6,6 +6,7 @@ namespace App\Controller;
 use App\Core\View;
 use App\Model\Booking;
 use App\Model\Car;
+use App\Model\Review;
 use App\Model\User;
 
 class CabinetController
@@ -15,10 +16,19 @@ class CabinetController
         requireAuth();
         $user = auth();
         $bookings = Booking::findByUser((int) $user['id']);
+
+        $reviewedBookingIds = [];
+        foreach ($bookings as $b) {
+            if (($b['status'] ?? '') === 'done' && Review::findByBooking((int) $b['id']) !== null) {
+                $reviewedBookingIds[] = (int) $b['id'];
+            }
+        }
+
         View::render('cabinet', [
             'title' => 'Личный кабинет',
             'user' => $user,
             'bookings' => $bookings,
+            'reviewedBookingIds' => $reviewedBookingIds,
         ]);
     }
 

@@ -57,7 +57,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         form.addEventListener('change', updateNextButton);
 
-        show(0);
+        const initialStep = form.hasAttribute('data-skip-to')
+            ? parseInt(form.getAttribute('data-skip-to'), 10) - 1
+            : 0;
+        show(Math.max(0, Math.min(initialStep, steps.length - 1)));
     }
 
     // Плашка согласия на использование cookie.
@@ -165,4 +168,48 @@ document.addEventListener('DOMContentLoaded', () => {
             document.cookie = DRAFT_COOKIE + '=; max-age=0; path=/; samesite=Lax';
         });
     }
+
+    // Калькулятор стоимости на главной странице.
+    const calcTotal = document.getElementById('calc-total');
+    if (calcTotal) {
+        const calcServices = Array.from(document.querySelectorAll('input[name="service_ids[]"]'));
+        const calcCarClasses = Array.from(document.querySelectorAll('input[name="car_class"]'));
+
+        const recalc = () => {
+            const sum = calcServices.reduce((acc, cb) => {
+                if (!cb.checked) return acc;
+                const raw = (cb.dataset.price || '').trim();
+                if (raw === '' || raw === '0') return acc;
+                const price = parseFloat(raw);
+                return Number.isFinite(price) ? acc + price : acc;
+            }, 0);
+
+            calcTotal.textContent = sum === 0
+                ? 'от 0 ₽'
+                : 'от ' + sum.toLocaleString('ru-RU') + ' ₽';
+        };
+
+        calcServices.forEach((cb) => cb.addEventListener('change', recalc));
+        calcCarClasses.forEach((radio) => radio.addEventListener('change', recalc));
+        recalc();
+    }
+
+    // Маска телефона: +7 (XXX) XXX-XX-XX для всех полей type="tel".
+    document.querySelectorAll('input[type="tel"]').forEach((input) => {
+        const formatPhone = (v) => {
+            let d = v.replace(/\D/g, '');
+            if (d.startsWith('8')) d = '7' + d.slice(1);
+            if (d.startsWith('7')) d = d.slice(1);
+            d = d.slice(0, 10);
+            let out = '+7';
+            if (d.length) out += ' (' + d.slice(0, 3);
+            if (d.length >= 3) out += ')';
+            if (d.length > 3) out += ' ' + d.slice(3, 6);
+            if (d.length > 6) out += '-' + d.slice(6, 8);
+            if (d.length > 8) out += '-' + d.slice(8, 10);
+            return out;
+        };
+        input.addEventListener('input', () => { input.value = formatPhone(input.value); });
+        if (input.value) input.value = formatPhone(input.value);
+    });
 });

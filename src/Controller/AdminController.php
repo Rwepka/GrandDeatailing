@@ -32,6 +32,28 @@ class AdminController
     }
 
     /**
+     * Доход по дням (JSON) для графика на дашборде.
+     */
+    public function income(): void
+    {
+        requireAdmin();
+
+        $from = (string) ($_GET['from'] ?? '');
+        $to = (string) ($_GET['to'] ?? '');
+
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $from) || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $to)) {
+            $from = date('Y-m-01');
+            $to = date('Y-m-d');
+        }
+
+        $data = Booking::incomeByPeriod($from, $to);
+
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['from' => $from, 'to' => $to, 'data' => $data], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    /**
      * Список всех заявок.
      */
     public function bookings(): void
@@ -40,7 +62,7 @@ class AdminController
 
         View::renderAdmin('bookings', [
             'title' => 'Заявки',
-            'bookings' => Booking::latest(),
+            'bookings' => Booking::latestWithCost(),
             'flash' => flash(),
         ]);
     }
@@ -65,6 +87,24 @@ class AdminController
         $allowed = ['new', 'confirmed', 'in_work', 'done', 'ready', 'cancelled'];
         if (!in_array($status, $allowed, true)) {
             redirect('/admin/bookings');
+        }
+
+        if ($status === 'in_work') {
+            $cost = (float) str_replace(',', '.', (string) ($_POST['cost'] ?? ''));
+            if ($cost <= 0) {
+                setFlash('Введите корректную согласованную стоимость.');
+                redirect('/admin/bookings');
+            }
+            Booking::setAgreedCost($id, $cost);
+        }
+
+        if ($status === 'done') {
+            $cost = (float) str_replace(',', '.', (string) ($_POST['cost'] ?? ''));
+            if ($cost <= 0) {
+                setFlash('Введите корректную итоговую стоимость.');
+                redirect('/admin/bookings');
+            }
+            Booking::setFinalCost($id, $cost);
         }
 
         Booking::updateStatus($id, $status);
@@ -130,6 +170,27 @@ class AdminController
         Booking::linkUser($id, $userId);
 
         setFlash('Клиент создан: ' . $phone . '. Временный пароль: ' . $password . ' (сообщите клиенту).');
+        redirect('/admin/bookings');
+    }
+
+    /**
+     * Удаление заявки (только администратор, не мастер).
+     */
+    public function deleteBooking(int $id): void
+    {
+        requireAdmin();
+
+        if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
+            redirect('/admin/bookings');
+        }
+
+        if (!csrf_verify($_POST['csrf_token'] ?? null)) {
+            http_response_code(419);
+            redirect('/admin/bookings');
+        }
+
+        Booking::delete($id);
+        setFlash('Заявка удалена.');
         redirect('/admin/bookings');
     }
 }

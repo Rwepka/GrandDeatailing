@@ -11,7 +11,7 @@ class AdminReviewController
     public function index(): void
     {
         requireAdmin();
-        $reviews = Review::latest();
+        $reviews = Review::latestWithDetails();
         View::renderAdmin('reviews', ['reviews' => $reviews]);
     }
 

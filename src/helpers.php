@@ -262,6 +262,23 @@ function normalize_phone(string $phone): string
 }
 
 /**
+ * Классы автомобилей (для квиза записи и калькулятора).
+ *
+ * @return array<int, string>
+ */
+function car_classes(): array
+{
+    return [
+        'Седан',
+        'Кроссовер / SUV',
+        'Минивэн',
+        'Купе / Спорт',
+        'Универсал',
+        'Хэтчбек',
+    ];
+}
+
+/**
  * Установить одноразовое сообщение (flash) для показа после редиректа.
  */
 function setFlash(string $message): void

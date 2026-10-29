@@ -5,6 +5,7 @@
  */
 $user = $user ?? [];
 $bookings = $bookings ?? [];
+$reviewedBookingIds = $reviewedBookingIds ?? [];
 
 $statusLabels = [
     'new' => 'Новая',
@@ -37,6 +38,9 @@ $statusLabels = [
                         <p>Автомобиль: <?= e((string) ($booking['car_info'] ?: '—')) ?></p>
                         <?php if (!empty($booking['comment'])): ?>
                             <p>Комментарий: <?= e((string) $booking['comment']) ?></p>
+                        <?php endif; ?>
+                        <?php if ($status === 'done' && !in_array((int) $booking['id'], $reviewedBookingIds, true)): ?>
+                            <a href="<?= e(url('/reviews/create?booking_id=' . $booking['id'])) ?>" class="btn btn-accent">Оставить отзыв</a>
                         <?php endif; ?>
                     </div>
                 <?php endforeach; ?>

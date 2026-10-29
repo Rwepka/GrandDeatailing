@@ -24,6 +24,36 @@
     </div>
 </section>
 
+<section class="section calculator-section">
+    <div class="container">
+        <h2>Калькулятор стоимости</h2>
+        <p class="lead">Выберите класс автомобиля и услуги — покажем примерную стоимость «от».</p>
+        <form method="GET" action="<?= e(url('/booking')) ?>" class="calculator">
+            <div class="field-group">
+                <label>Класс автомобиля</label>
+                <div class="option-grid">
+                    <?php foreach ($carClasses ?? [] as $carClass): ?>
+                        <label class="option"><input type="radio" name="car_class" value="<?= e($carClass) ?>"><span><?= e($carClass) ?></span></label>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+            <div class="field-group">
+                <label>Услуги</label>
+                <div class="calculator-services">
+                    <?php foreach ($calculatorServices ?? [] as $s): ?>
+                        <label class="calculator-service">
+                            <input type="checkbox" name="service_ids[]" value="<?= e((string)$s['id']) ?>" data-price="<?= e((string)($s['price_from'] ?? '')) ?>">
+                            <span><?= e((string)$s['title']) ?></span>
+                        </label>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+            <div class="calculator-total">Итого: <strong id="calc-total">от 0 ₽</strong></div>
+            <button type="submit" class="btn btn-accent">Записаться</button>
+        </form>
+    </div>
+</section>
+
 <section class="section section-muted">
     <div class="container">
         <h2>Почему мы</h2>

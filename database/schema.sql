@@ -110,6 +110,8 @@ CREATE TABLE bookings (
     client_name  VARCHAR(100) NULL,
     client_phone VARCHAR(20)  NULL,
     car_info     VARCHAR(255) NULL,
+    agreed_cost  DECIMAL(10, 2) NULL,
+    final_cost   DECIMAL(10, 2) NULL,
     created_at   DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
     KEY idx_bookings_status (status),
