@@ -1,0 +1,27 @@
+# GRAND DETAILING — настройки веб-сервера (Apache)
+
+# Запрет листинга каталогов
+Options -Indexes
+
+# Базовые заголовки безопасности
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Существующие файлы и папки (css, js, картинки, uploads) отдаём напрямую.
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+
+    # Всё остальное направляем на фронт-контроллер.
+    RewriteRule ^ index.php [L]
+</IfModule>
+
+# Блокировка скрытых файлов (.env, .git и т.п.)
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>

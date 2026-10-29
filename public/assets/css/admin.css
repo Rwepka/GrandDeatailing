@@ -1,0 +1,74 @@
+/* ============================================================
+   GRAND DETAILING — стили админ-панели
+   ============================================================ */
+
+.admin-body { background: var(--bg-muted); }
+.admin-layout { display: flex; min-height: 100vh; }
+.admin-sidebar {
+    width: 240px;
+    background: #fff;
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    padding: 20px 0;
+}
+.admin-sidebar .logo { display: block; padding: 0 20px 20px; }
+.admin-nav { display: flex; flex-direction: column; }
+.admin-nav a {
+    padding: 12px 20px;
+    color: var(--text-muted);
+    font-weight: 500;
+    border-left: 3px solid transparent;
+}
+.admin-nav a:hover { background: var(--bg-muted); color: var(--text); }
+.admin-nav a.active { background: var(--bg-muted); color: var(--text); border-left-color: var(--gold); }
+.admin-sidebar-footer {
+    margin-top: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+}
+.admin-main { flex: 1; padding: 32px; min-width: 0; }
+.admin-main h1 { margin-bottom: 24px; }
+
+/* KPI-карточки */
+.admin-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-bottom: 28px; }
+.admin-kpi { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
+.admin-kpi .value { font-size: 30px; font-weight: 700; color: var(--gold); }
+.admin-kpi .label { color: var(--text-muted); margin-top: 4px; }
+
+/* Таблицы */
+.table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.admin-table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.admin-table th, .admin-table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); vertical-align: top; }
+.admin-table th { background: var(--bg-muted); font-weight: 600; }
+.admin-table tr:last-child td { border-bottom: none; }
+.admin-table .actions { white-space: nowrap; }
+
+/* Статусы-бейджи */
+.badge { display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 13px; font-weight: 600; }
+.badge-new { background: var(--bg-muted); color: var(--text); }
+.badge-confirmed { background: #dbeafe; color: #1d4ed8; }
+.badge-in_work { background: #fef3c7; color: #b45309; }
+.badge-done { background: #dcfce7; color: #15803d; }
+.badge-ready { background: #ede9fe; color: #6d28d9; }
+.badge-cancelled { background: #fee2e2; color: #b91c1c; }
+
+/* Мелкие формы в строке (смена статуса, toggle) */
+.inline-form { display: inline-block; margin: 0; }
+.inline-form button { cursor: pointer; }
+.btn-sm { padding: 6px 12px; font-size: 13px; }
+
+/* Адаптив админки */
+@media (max-width: 820px) {
+    .admin-layout { flex-direction: column; }
+    .admin-sidebar { width: 100%; flex-direction: row; align-items: center; padding: 12px; gap: 12px; }
+    .admin-sidebar .logo { padding: 0; }
+    .admin-nav { flex-direction: row; flex-wrap: wrap; }
+    .admin-nav a { padding: 8px 12px; border-left: none; border-radius: 8px; }
+    .admin-sidebar-footer { margin-top: 0; padding: 0; flex-direction: row; align-items: center; }
+    .admin-main { padding: 20px; }
+}

@@ -1,0 +1,27 @@
+<?php
+/**
+ * @var array<string, mixed> $user
+ */
+$user = $user ?? [];
+
+$roleLabels = [
+    1 => 'Клиент',
+    2 => 'Администратор',
+    3 => 'Мастер',
+];
+$roleId = (int) ($user['role_id'] ?? 0);
+$roleLabel = $roleLabels[$roleId] ?? 'Неизвестно';
+?>
+<section class="section">
+    <div class="container">
+        <?php $active = 'profile'; require BASE_PATH . '/views/cabinet/_tabs.php'; ?>
+
+        <div class="card">
+            <p>Имя: <?= e((string) ($user['name'] ?? '—')) ?></p>
+            <p>Телефон: <?= e((string) ($user['phone'] ?? '—')) ?></p>
+            <p>Email: <?= e((string) ($user['email'] ?: '—')) ?></p>
+            <p>Скидка: <?= e((string) ($user['discount'] ?? '0')) ?>%</p>
+            <p>Роль: <?= e($roleLabel) ?></p>
+        </div>
+    </div>
+</section>
