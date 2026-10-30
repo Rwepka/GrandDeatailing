@@ -15,9 +15,14 @@ $statusLabels = [
     'ready' => 'Готова к выдаче',
     'cancelled' => 'Отменена',
 ];
+
+$crumbs = [
+    ['label' => 'Личный кабинет'],
+];
 ?>
 <section class="section">
     <div class="container">
+        <?php require BASE_PATH . '/views/partials/breadcrumbs.php'; ?>
         <?php $active = 'cabinet'; require BASE_PATH . '/views/cabinet/_tabs.php'; ?>
         <p class="lead">Здравствуйте, <?= e((string) ($user['name'] ?? '')) ?>!</p>
 

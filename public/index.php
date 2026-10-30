@@ -25,6 +25,7 @@ use App\Controller\AdminReviewController;
 use App\Controller\AdminMessageController;
 use App\Controller\AdminMasterController;
 use App\Controller\AdminClientController;
+use App\Controller\AdminSettingsController;
 
 $router = new Router();
 
@@ -79,6 +80,8 @@ $router->get('/admin/masters', [AdminMasterController::class, 'index']);
 $router->get('/admin/masters/create', [AdminMasterController::class, 'create']);
 $router->post('/admin/masters', [AdminMasterController::class, 'store']);
 $router->get('/admin/clients', [AdminClientController::class, 'index']);
+$router->get('/admin/settings', [AdminSettingsController::class, 'index']);
+$router->post('/admin/settings', [AdminSettingsController::class, 'store']);
 
 // По мере разработки добавляются:
 //   $router->get('/login', [AuthController::class, 'showLogin']);

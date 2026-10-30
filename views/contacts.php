@@ -9,9 +9,14 @@
 $errors = $errors ?? [];
 $old = $old ?? [];
 $flash = $flash ?? null;
+
+$crumbs = [
+    ['label' => 'Контакты'],
+];
 ?>
 <section class="section">
     <div class="container">
+        <?php require BASE_PATH . '/views/partials/breadcrumbs.php'; ?>
         <h1>Контакты</h1>
 
         <?php if ($flash !== null): ?>
@@ -29,19 +34,30 @@ $flash = $flash ?? null;
             </div>
         <?php endif; ?>
 
+        <?php
+        $phone = (string) setting('phone', '+7 (988) 413-07-77');
+        $telHref = (string) preg_replace('/\D+/', '', $phone);
+        $workHours = (string) setting('work_hours', 'Ежедневно с 9:00 до 20:00');
+        ?>
         <div class="card">
             <div class="field-group">
                 <label>Адрес</label>
-                <p>г. Туапсе, ул. Богдана Хмельницкого, 16</p>
+                <p><?= e(setting('address', 'г. Туапсе, ул. Богдана Хмельницкого, 16')) ?></p>
             </div>
             <div class="field-group">
                 <label>Телефон</label>
-                <p><a href="tel:+79884130777">+7 (988) 413-07-77</a></p>
+                <p><a href="tel:<?= e($telHref) ?>"><?= e($phone) ?></a></p>
             </div>
+            <?php if ($workHours !== ''): ?>
+            <div class="field-group">
+                <label>Режим работы</label>
+                <p><?= e($workHours) ?></p>
+            </div>
+            <?php endif; ?>
         </div>
 
         <div class="map">
-            <iframe src="https://yandex.ru/map-widget/v1/?ll=39.087091%2C44.104854&z=17" width="100%" height="400" style="border:0;" allowfullscreen loading="lazy"></iframe>
+            <iframe src="https://yandex.ru/map-widget/v1/?ll=<?= e(setting('map_lng', '39.087091')) ?>%2C<?= e(setting('map_lat', '44.104854')) ?>&z=17" width="100%" height="400" style="border:0;" allowfullscreen loading="lazy"></iframe>
         </div>
 
         <div class="card">

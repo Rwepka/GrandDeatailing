@@ -15,9 +15,14 @@ $skipToStep3 = $skipToStep3 ?? false;
 
 $oldServiceIds = array_map('intval', (array) ($old['service_ids'] ?? []));
 $oldCarClass = (string) ($old['car_class'] ?? '');
+
+$crumbs = [
+    ['label' => 'Запись онлайн'],
+];
 ?>
 <section class="section">
     <div class="container">
+        <?php require BASE_PATH . '/views/partials/breadcrumbs.php'; ?>
         <h1>Запись онлайн</h1>
         <p class="lead">Заполните форму за 3 шага — мы перезвоним и подтвердим запись.</p>
 

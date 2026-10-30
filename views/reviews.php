@@ -4,9 +4,13 @@
  *
  * @var array<int, array<string, mixed>> $reviews
  */
+$crumbs = [
+    ['label' => 'Отзывы'],
+];
 ?>
 <section class="section">
     <div class="container">
+        <?php require BASE_PATH . '/views/partials/breadcrumbs.php'; ?>
         <h1>Отзывы</h1>
         <p class="lead">Что говорят о нас клиенты студии.</p>
 

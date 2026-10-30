@@ -11,9 +11,15 @@ $roleLabels = [
 ];
 $roleId = (int) ($user['role_id'] ?? 0);
 $roleLabel = $roleLabels[$roleId] ?? 'Неизвестно';
+
+$crumbs = [
+    ['label' => 'Личный кабинет', 'url' => url('/cabinet')],
+    ['label' => 'Профиль'],
+];
 ?>
 <section class="section">
     <div class="container">
+        <?php require BASE_PATH . '/views/partials/breadcrumbs.php'; ?>
         <?php $active = 'profile'; require BASE_PATH . '/views/cabinet/_tabs.php'; ?>
 
         <div class="card">

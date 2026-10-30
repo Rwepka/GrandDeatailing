@@ -7,9 +7,15 @@
 $cars = $cars ?? [];
 $errors = $errors ?? [];
 $old = $old ?? [];
+
+$crumbs = [
+    ['label' => 'Личный кабинет', 'url' => url('/cabinet')],
+    ['label' => 'Мои автомобили'],
+];
 ?>
 <section class="section">
     <div class="container">
+        <?php require BASE_PATH . '/views/partials/breadcrumbs.php'; ?>
         <?php $active = 'cars'; require BASE_PATH . '/views/cabinet/_tabs.php'; ?>
 
         <?php if (!empty($errors)): ?>

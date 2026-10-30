@@ -3,9 +3,13 @@
  * @var array<int, array<string, mixed>> $categories
  * @var array<int, array<int, array<string, mixed>>> $servicesByCategory
  */
+$crumbs = [
+    ['label' => 'Услуги'],
+];
 ?>
 <section class="section">
     <div class="container">
+        <?php require BASE_PATH . '/views/partials/breadcrumbs.php'; ?>
         <h1>Услуги</h1>
 
         <?php foreach ($categories as $cat): ?>

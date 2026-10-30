@@ -32,4 +32,50 @@ document.addEventListener('DOMContentLoaded', () => {
         input.addEventListener('input', () => { input.value = formatPhone(input.value); });
         if (input.value) input.value = formatPhone(input.value);
     });
+
+    // Подтверждение сохранения настроек (сводка изменений).
+    const settingsForm = document.getElementById('settings-form');
+    const settingsModal = document.getElementById('settings-modal');
+    if (settingsForm && settingsModal) {
+        const changesList = document.getElementById('settings-changes');
+        const cancelBtn = document.getElementById('settings-cancel');
+        const confirmBtn = document.getElementById('settings-confirm');
+        let allowSubmit = false;
+
+        settingsForm.addEventListener('submit', (e) => {
+            if (allowSubmit) return;
+
+            const changes = [];
+            settingsForm.querySelectorAll('input[data-old]').forEach((input) => {
+                if (input.value !== input.dataset.old) {
+                    changes.push({
+                        label: input.dataset.label || input.name,
+                        old: input.dataset.old,
+                        neu: input.value,
+                    });
+                }
+            });
+
+            e.preventDefault();
+            if (changes.length === 0) {
+                alert('Нет изменений.');
+                return;
+            }
+
+            changesList.innerHTML = '';
+            changes.forEach((c) => {
+                const li = document.createElement('li');
+                li.textContent = c.label + ': ' + (c.old || '—') + ' → ' + (c.neu || '—');
+                changesList.appendChild(li);
+            });
+            settingsModal.hidden = false;
+        });
+
+        cancelBtn.addEventListener('click', () => { settingsModal.hidden = true; });
+        confirmBtn.addEventListener('click', () => {
+            settingsModal.hidden = true;
+            allowSubmit = true;
+            settingsForm.submit();
+        });
+    }
 });

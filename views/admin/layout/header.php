@@ -29,6 +29,7 @@ $current = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/';
                 <a href="<?= e(url('/admin/masters')) ?>" class="<?= str_starts_with($current, '/admin/masters') ? 'active' : '' ?>">Мастера</a>
                 <a href="<?= e(url('/admin/reviews')) ?>" class="<?= str_starts_with($current, '/admin/reviews') ? 'active' : '' ?>">Отзывы</a>
                 <a href="<?= e(url('/admin/messages')) ?>" class="<?= str_starts_with($current, '/admin/messages') ? 'active' : '' ?>">Сообщения</a>
+                <a href="<?= e(url('/admin/settings')) ?>" class="<?= str_starts_with($current, '/admin/settings') ? 'active' : '' ?>">Настройки</a>
             <?php endif; ?>
         </nav>
         <div class="admin-sidebar-footer">

@@ -9,9 +9,15 @@ $user = $user ?? [];
 $errors = $errors ?? [];
 $old = $old ?? [];
 $flash = $flash ?? null;
+
+$crumbs = [
+    ['label' => 'Личный кабинет', 'url' => url('/cabinet')],
+    ['label' => 'Безопасность'],
+];
 ?>
 <section class="section">
     <div class="container">
+        <?php require BASE_PATH . '/views/partials/breadcrumbs.php'; ?>
         <?php $active = 'security'; require BASE_PATH . '/views/cabinet/_tabs.php'; ?>
 
         <?php if (!empty($flash)): ?>

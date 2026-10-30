@@ -269,3 +269,17 @@ CREATE TABLE rate_limits (
   COMMENT = 'Лимит отправок форм по IP';
 
 SET FOREIGN_KEY_CHECKS = 1;
+
+-- ---------------------------------------------------------------------
+-- Настройки сайта (ключ → значение)
+-- ---------------------------------------------------------------------
+CREATE TABLE settings (
+    id    INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `key` VARCHAR(100) NOT NULL,
+    value TEXT         NULL,
+    PRIMARY KEY (id),
+    UNIQUE KEY uq_settings_key (`key`)
+) ENGINE = InnoDB
+  DEFAULT CHARACTER SET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci
+  COMMENT = 'Настройки сайта (адрес, телефон и т.п.)';

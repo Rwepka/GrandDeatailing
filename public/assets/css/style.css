@@ -219,3 +219,9 @@ a { color: var(--blue); text-decoration: none; }
 .calculator-service { border: 1px solid var(--border, #e5e7eb); border-radius: 8px; padding: 8px 12px; cursor: pointer; display: flex; gap: 8px; align-items: center; }
 .calculator-total { font-size: 18px; margin-top: 8px; }
 .calculator-total strong { color: #B8860B; font-size: 24px; }
+
+/* --- Хлебные крошки --- */
+.breadcrumbs { font-size: 14px; color: var(--text-muted, #6b7280); margin-bottom: 16px; }
+.breadcrumbs a { color: #1D4ED8; text-decoration: none; }
+.breadcrumbs a:hover { text-decoration: underline; }
+.breadcrumbs .sep { margin: 0 6px; color: #9ca3af; }

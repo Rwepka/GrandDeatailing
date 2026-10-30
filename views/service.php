@@ -14,9 +14,15 @@ if ($durationMin === null) {
         ? '~' . $hours . ' ч'
         : '~' . $hours . ' ч ' . $minutes . ' мин';
 }
+
+$crumbs = [
+    ['label' => 'Услуги', 'url' => url('/services')],
+    ['label' => (string) ($service['title'] ?? 'Услуга')],
+];
 ?>
 <section class="section">
     <div class="container">
+        <?php require BASE_PATH . '/views/partials/breadcrumbs.php'; ?>
         <h1><?= e($service['title']) ?></h1>
 
         <p class="price"><?= e(price($service['price_from'] === null ? null : (float) $service['price_from'])) ?></p>

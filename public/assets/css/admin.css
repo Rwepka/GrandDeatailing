@@ -81,3 +81,11 @@
 .income-total { margin-top: 16px; padding: 14px 18px; background: #F1F5F9; border: 1px solid #E5E7EB; border-radius: 10px; font-size: 15px; color: #1F2937; }
 .income-total strong { font-size: 22px; color: #B8860B; margin-left: 4px; }
 .table-search { width: 100%; max-width: 360px; padding: 10px 12px; margin-bottom: 16px; border: 1px solid #E5E7EB; border-radius: 8px; font-size: 14px; }
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+.modal-overlay[hidden] { display: none; }
+.modal { background: #fff; border-radius: 12px; padding: 24px; max-width: 480px; width: 100%; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
+.modal h2 { margin-top: 0; }
+.modal-warning { color: #b45309; font-weight: 600; }
+.modal-changes { list-style: none; padding: 0; margin: 12px 0; max-height: 300px; overflow: auto; }
+.modal-changes li { padding: 6px 0; border-bottom: 1px solid #f1f5f9; }
+.modal-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 16px; }

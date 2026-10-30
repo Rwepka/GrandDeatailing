@@ -279,6 +279,14 @@ function car_classes(): array
 }
 
 /**
+ * Получить значение настройки сайта (с fallback по умолчанию).
+ */
+function setting(string $key, ?string $default = null): ?string
+{
+    return \App\Model\Setting::get($key, $default);
+}
+
+/**
  * Установить одноразовое сообщение (flash) для показа после редиректа.
  */
 function setFlash(string $message): void
