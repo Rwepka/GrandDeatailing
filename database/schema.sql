@@ -283,22 +283,3 @@ CREATE TABLE settings (
   DEFAULT CHARACTER SET = utf8mb4
   COLLATE = utf8mb4_unicode_ci
   COMMENT = 'Настройки сайта (адрес, телефон и т.п.)';
-
--- ---------------------------------------------------------------------
--- Привязка Telegram-чатов (подписка клиентов на уведомления)
--- ---------------------------------------------------------------------
-CREATE TABLE telegram_links (
-    id         INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    token      VARCHAR(64)  NOT NULL,
-    user_id    INT UNSIGNED NULL,
-    booking_id INT UNSIGNED NULL,
-    chat_id    VARCHAR(64)  NULL,
-    created_at DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (id),
-    UNIQUE KEY uq_telegram_links_token (token),
-    KEY idx_telegram_links_user (user_id),
-    KEY idx_telegram_links_booking (booking_id)
-) ENGINE = InnoDB
-  DEFAULT CHARACTER SET = utf8mb4
-  COLLATE = utf8mb4_unicode_ci
-  COMMENT = 'Подписки на Telegram-уведомления';

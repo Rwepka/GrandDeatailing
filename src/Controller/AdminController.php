@@ -6,7 +6,6 @@ namespace App\Controller;
 use App\Core\Database;
 use App\Core\View;
 use App\Model\Booking;
-use App\Model\TelegramLink;
 use App\Model\User;
 
 class AdminController
@@ -110,26 +109,6 @@ class AdminController
 
         Booking::updateStatus($id, $status);
 
-        // Уведомление клиенту о смене статуса (если чат привязан).
-        $chatId = TelegramLink::chatIdByBooking($id);
-        if ($chatId === null) {
-            $b = Booking::find($id);
-            if ($b !== null && !empty($b['user_id'])) {
-                $chatId = TelegramLink::chatIdByUser((int) $b['user_id']);
-            }
-        }
-        if ($chatId !== null) {
-            $labels = [
-                'new' => 'Новая',
-                'confirmed' => 'Подтверждена',
-                'in_work' => 'В работе',
-                'done' => 'Выполнена',
-                'ready' => 'Готова к выдаче',
-                'cancelled' => 'Отменена',
-            ];
-            telegram_send($chatId, 'Статус вашей заявки #' . $id . ' изменён: ' . ($labels[$status] ?? $status));
-        }
-
         redirect('/admin/bookings');
     }
 
@@ -189,12 +168,6 @@ class AdminController
         ]);
 
         Booking::linkUser($id, $userId);
-
-        // Отправляем клиенту логин и пароль, если чат привязан.
-        $chatId = TelegramLink::chatIdByBooking($id);
-        if ($chatId !== null) {
-            telegram_send($chatId, "Вы зарегистрированы на сайте.\nЛогин: {$phone}\nПароль: {$password}\nВойдите: " . setting('app.url', 'https://grand-detailing.ru'));
-        }
 
         setFlash('Клиент создан: ' . $phone . '. Временный пароль: ' . $password . ' (сообщите клиенту).');
         redirect('/admin/bookings');

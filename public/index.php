@@ -17,7 +17,6 @@ use App\Controller\ServiceController;
 use App\Controller\BookingController;
 use App\Controller\ContactController;
 use App\Controller\ReviewController;
-use App\Controller\TelegramController;
 use App\Controller\AuthController;
 use App\Controller\CabinetController;
 use App\Controller\AdminController;
@@ -42,7 +41,6 @@ $router->post('/contacts', [ContactController::class, 'store']);
 $router->get('/reviews', [ReviewController::class, 'index']);
 $router->get('/reviews/create', [ReviewController::class, 'create']);
 $router->post('/reviews', [ReviewController::class, 'store']);
-$router->post('/api/telegram/webhook', [TelegramController::class, 'webhook']);
 
 // --- Авторизация ---
 $router->get('/register', [AuthController::class, 'showRegister']);

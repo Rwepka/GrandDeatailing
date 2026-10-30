@@ -9,10 +9,6 @@
     <div class="container text-center">
         <h1>Спасибо! Заявка отправлена</h1>
         <p style="margin: 16px 0; color: var(--text-muted);">Мы получили вашу заявку и свяжемся с вами в ближайшее время, чтобы подтвердить запись.</p>
-        <?php $tgBotToken = setting('telegram_bot_token'); ?>
-        <?php if ($tgBotToken !== null && $tgBotToken !== ''): ?>
-            <p style="margin: 16px 0; color: var(--text-muted);">Хотите получать уведомления о статусе заявки в Telegram? Напишите нам в Telegram.</p>
-        <?php endif; ?>
         <a href="<?= e(url('/')) ?>" class="btn btn-gold">На главную</a>
     </div>
 </section>
