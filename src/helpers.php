@@ -287,6 +287,45 @@ function setting(string $key, ?string $default = null): ?string
 }
 
 /**
+ * Отправка сообщения в Telegram (best-effort, не бросает исключений).
+ */
+function telegram_send(string $chatId, string $text): bool
+{
+    $token = setting('telegram_bot_token');
+    if ($token === null || $token === '') {
+        return false;
+    }
+
+    $url = 'https://api.telegram.org/bot' . $token . '/sendMessage';
+    $payload = http_build_query(['chat_id' => $chatId, 'text' => $text]);
+
+    if (function_exists('curl_init')) {
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => $payload,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT => 10,
+        ]);
+        $response = curl_exec($ch);
+    } else {
+        $context = stream_context_create(['http' => [
+            'method' => 'POST',
+            'header' => "Content-Type: application/x-www-form-urlencoded\r\n",
+            'content' => $payload,
+            'timeout' => 10,
+        ]]);
+        $response = @file_get_contents($url, false, $context);
+    }
+
+    if ($response === false) {
+        return false;
+    }
+    $json = json_decode((string) $response, true);
+    return ($json['ok'] ?? false) === true;
+}
+
+/**
  * Установить одноразовое сообщение (flash) для показа после редиректа.
  */
 function setFlash(string $message): void

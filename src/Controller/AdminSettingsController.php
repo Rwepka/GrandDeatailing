@@ -26,6 +26,8 @@ class AdminSettingsController
         'vk'         => ['label' => 'VK (ссылка)',       'default' => ''],
         'map_lat'    => ['label' => 'Широта карты',      'default' => '44.104854'],
         'map_lng'    => ['label' => 'Долгота карты',     'default' => '39.087091'],
+        'telegram_bot_token'      => ['label' => 'Telegram: токен бота', 'default' => ''],
+        'telegram_master_chat_id' => ['label' => 'Telegram: chat_id для заявок', 'default' => ''],
     ];
 
     public function index(): void

@@ -26,6 +26,17 @@ $crumbs = [
         <?php $active = 'cabinet'; require BASE_PATH . '/views/cabinet/_tabs.php'; ?>
         <p class="lead">Здравствуйте, <?= e((string) ($user['name'] ?? '')) ?>!</p>
 
+        <?php
+            $tgBotToken = setting('telegram_bot_token');
+            $tgUserId = (int) ($user['id'] ?? 0);
+        ?>
+        <?php if ($tgBotToken !== null && $tgBotToken !== '' && $tgUserId > 0): ?>
+            <?php $tgToken = \App\Model\TelegramLink::tokenFor($tgUserId, null); ?>
+            <div class="card">
+                <p>Telegram-уведомления: напишите боту команду <code>/start <?= e($tgToken) ?></code>, чтобы получать статусы заявок.</p>
+            </div>
+        <?php endif; ?>
+
         <?php if (empty($bookings)): ?>
             <p>Записей пока нет</p>
             <a href="<?= e(url('/booking')) ?>" class="btn btn-gold">Записаться</a>

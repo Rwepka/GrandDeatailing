@@ -254,6 +254,17 @@ class BookingController
             return;
         }
 
+        // Уведомление мастеру о новой заявке (best-effort).
+        $masterChatId = setting('telegram_master_chat_id');
+        if ($masterChatId !== null && $masterChatId !== '') {
+            $titles = [];
+            foreach ($serviceIds as $sid) {
+                $titles[] = (string) ($activeById[$sid]['title'] ?? '');
+            }
+            $msg = "Новая заявка #{$bookingId}\n{$name}\n{$phone}\n{$carInfo}\nУслуги: " . implode(', ', array_filter($titles));
+            telegram_send($masterChatId, $msg);
+        }
+
         RateLimit::record($ip);
         redirect('/booking/success');
     }
