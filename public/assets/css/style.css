@@ -225,3 +225,29 @@ a { color: var(--blue); text-decoration: none; }
 .breadcrumbs a { color: #1D4ED8; text-decoration: none; }
 .breadcrumbs a:hover { text-decoration: underline; }
 .breadcrumbs .sep { margin: 0 6px; color: #9ca3af; }
+
+/* --- Личный кабинет: боковое меню --- */
+.cabinet-layout { display: grid; grid-template-columns: 240px 1fr; gap: 24px; align-items: start; }
+.cabinet-sidebar { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; }
+.cabinet-menu { display: flex; flex-direction: column; }
+.cabinet-menu a { padding: 12px 14px; border-radius: 8px; color: var(--text); font-weight: 500; }
+.cabinet-menu a:hover { background: var(--bg-muted); }
+.cabinet-menu a.active { background: var(--bg-muted); color: var(--gold); font-weight: 700; }
+.cabinet-logout { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); }
+.cabinet-content { min-width: 0; }
+@media (max-width: 720px) {
+    .cabinet-layout { grid-template-columns: 1fr; }
+    .cabinet-sidebar { display: flex; flex-direction: row; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .cabinet-menu { flex-direction: row; flex-wrap: wrap; gap: 4px; }
+    .cabinet-logout { margin: 0; padding: 0; border: none; }
+}
+
+/* --- Статус-бейджи заявок --- */
+.badge { display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 13px; font-weight: 600; }
+.badge-new { background: var(--bg-muted); color: var(--text); }
+.badge-confirmed { background: #dbeafe; color: #1d4ed8; }
+.badge-in_work { background: #fef3c7; color: #b45309; }
+.badge-done { background: #dcfce7; color: #15803d; }
+.badge-ready { background: #ede9fe; color: #6d28d9; }
+.badge-cancelled { background: #fee2e2; color: #b91c1c; }
+.card .badge { margin-bottom: 8px; }

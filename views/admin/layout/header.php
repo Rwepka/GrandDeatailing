@@ -15,7 +15,9 @@ $current = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/';
 </head>
 <body class="admin-body">
 <div class="admin-layout">
-    <aside class="admin-sidebar">
+    <button class="admin-nav-toggle" id="admin-nav-toggle" aria-label="Открыть меню">☰</button>
+    <div class="admin-overlay" id="admin-overlay" hidden></div>
+    <aside class="admin-sidebar" id="admin-sidebar">
         <a href="<?= e(url('/')) ?>" class="logo">GRAND <span>DETAILING</span></a>
         <nav class="admin-nav">
             <?php if (isMaster()): ?>

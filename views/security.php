@@ -18,8 +18,9 @@ $crumbs = [
 <section class="section">
     <div class="container">
         <?php require BASE_PATH . '/views/partials/breadcrumbs.php'; ?>
-        <?php $active = 'security'; require BASE_PATH . '/views/cabinet/_tabs.php'; ?>
-
+        <div class="cabinet-layout">
+            <?php $active = 'security'; require BASE_PATH . '/views/cabinet/_sidebar.php'; ?>
+            <div class="cabinet-content">
         <?php if (!empty($flash)): ?>
             <div class="flash" role="status"><?= e((string) $flash) ?></div>
         <?php endif; ?>
@@ -77,6 +78,8 @@ $crumbs = [
                 </div>
                 <button type="submit" class="btn btn-gold">Сохранить</button>
             </form>
+        </div>
+            </div>
         </div>
     </div>
 </section>

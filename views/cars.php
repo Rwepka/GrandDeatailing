@@ -16,8 +16,9 @@ $crumbs = [
 <section class="section">
     <div class="container">
         <?php require BASE_PATH . '/views/partials/breadcrumbs.php'; ?>
-        <?php $active = 'cars'; require BASE_PATH . '/views/cabinet/_tabs.php'; ?>
-
+        <div class="cabinet-layout">
+            <?php $active = 'cars'; require BASE_PATH . '/views/cabinet/_sidebar.php'; ?>
+            <div class="cabinet-content">
         <?php if (!empty($errors)): ?>
             <div class="form-errors" role="alert">
                 <ul>
@@ -68,5 +69,7 @@ $crumbs = [
             </div>
             <button type="submit" class="btn btn-gold">Добавить</button>
         </form>
+            </div>
+        </div>
     </div>
 </section>

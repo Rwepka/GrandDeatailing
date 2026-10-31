@@ -61,6 +61,14 @@ document.addEventListener('DOMContentLoaded', () => {
             ? parseInt(form.getAttribute('data-skip-to'), 10) - 1
             : 0;
         show(Math.max(0, Math.min(initialStep, steps.length - 1)));
+
+        // Имя: только буквы, пробелы и дефис (без цифр и спецсимволов).
+        const nameInput = form.querySelector('input[name="name"]');
+        if (nameInput) {
+            nameInput.addEventListener('input', () => {
+                nameInput.value = nameInput.value.replace(/[^a-zA-Zа-яА-ЯёЁ\s-]/g, '');
+            });
+        }
     }
 
     // Плашка согласия на использование cookie.

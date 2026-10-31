@@ -1,5 +1,23 @@
 // GRAND DETAILING — скрипты админ-панели.
 document.addEventListener('DOMContentLoaded', () => {
+    // Гамбургер-меню на мобильном.
+    const adminToggle = document.getElementById('admin-nav-toggle');
+    const adminSidebar = document.getElementById('admin-sidebar');
+    const adminOverlay = document.getElementById('admin-overlay');
+    if (adminToggle && adminSidebar) {
+        const closeMenu = () => {
+            adminSidebar.classList.remove('open');
+            if (adminOverlay) adminOverlay.hidden = true;
+        };
+        adminToggle.addEventListener('click', () => {
+            const open = !adminSidebar.classList.contains('open');
+            adminSidebar.classList.toggle('open', open);
+            if (adminOverlay) adminOverlay.hidden = !open;
+        });
+        if (adminOverlay) adminOverlay.addEventListener('click', closeMenu);
+        adminSidebar.querySelectorAll('a').forEach((a) => a.addEventListener('click', closeMenu));
+    }
+
     // Живой поиск по таблицам: скрываем несовпадающие строки по мере ввода.
     document.querySelectorAll('[data-table-search]').forEach((input) => {
         const table = document.querySelector(input.getAttribute('data-table-search'));
