@@ -44,7 +44,7 @@ $crumbs = [
                     <label for="phone">Телефон</label>
                     <input type="tel" name="phone" id="phone" value="<?= e((string) ($old['phone'] ?? $user['phone'] ?? '')) ?>" placeholder="+7 900 000-00-00">
                 </div>
-                <button type="submit" class="btn btn-gold">Сохранить</button>
+                <button type="submit" class="btn btn-accent">Сохранить</button>
             </form>
         </div>
 
@@ -56,7 +56,7 @@ $crumbs = [
                     <label for="email">Email <small>(оставьте пустым, чтобы убрать)</small></label>
                     <input type="email" name="email" id="email" value="<?= e((string) ($old['email'] ?? $user['email'] ?? '')) ?>" placeholder="you@example.com">
                 </div>
-                <button type="submit" class="btn btn-gold">Сохранить</button>
+                <button type="submit" class="btn btn-accent">Сохранить</button>
             </form>
         </div>
 
@@ -76,7 +76,7 @@ $crumbs = [
                     <label for="password_confirmation">Повторите новый пароль</label>
                     <input type="password" name="password_confirmation" id="password_confirmation">
                 </div>
-                <button type="submit" class="btn btn-gold">Сохранить</button>
+                <button type="submit" class="btn btn-accent">Сохранить</button>
             </form>
         </div>
             </div>

@@ -54,7 +54,7 @@ $old = $old ?? [];
                     <input type="password" name="password_confirmation" id="password_confirmation" placeholder="Повторите пароль">
                 </div>
 
-                <button type="submit" class="btn btn-gold">Зарегистрироваться</button>
+                <button type="submit" class="btn btn-accent">Зарегистрироваться</button>
             </form>
 
             <p>Уже есть аккаунт? <a href="<?= e(url('/login')) ?>">Войти</a></p>

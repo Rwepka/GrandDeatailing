@@ -9,7 +9,7 @@ $services = $services ?? [];
 $categoryTitles = $categoryTitles ?? [];
 ?>
 <h1>Услуги</h1>
-<a href="<?= e(url('/admin/services/create')) ?>" class="btn btn-accent">Добавить услугу</a>
+<a href="<?= e(url('/admin/services/create')) ?>" class="btn btn-accent" style="margin-bottom: 16px;">Добавить услугу</a>
 
 <div class="table-responsive">
 <table class="admin-table">

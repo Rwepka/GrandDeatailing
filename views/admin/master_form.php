@@ -48,7 +48,7 @@ $isEdit = !empty($master);
             <input type="password" name="password" id="password" <?= $isEdit ? '' : 'minlength="8"' ?>>
         </div>
 
-        <button type="submit" class="btn btn-gold"><?= $isEdit ? 'Сохранить' : 'Создать' ?></button>
+        <button type="submit" class="btn btn-accent"><?= $isEdit ? 'Сохранить' : 'Создать' ?></button>
         <a href="<?= e(url('/admin/masters')) ?>" class="btn btn-outline">Отмена</a>
     </form>
 </div>

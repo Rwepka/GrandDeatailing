@@ -67,7 +67,7 @@ $crumbs = [
                 <label for="plate">Гос. номер <small>(необязательно)</small></label>
                 <input type="text" name="plate" id="plate" value="<?= e((string) ($old['plate'] ?? '')) ?>">
             </div>
-            <button type="submit" class="btn btn-gold">Добавить</button>
+            <button type="submit" class="btn btn-accent">Добавить</button>
         </form>
             </div>
         </div>

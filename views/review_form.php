@@ -56,7 +56,7 @@ $oldRating = (string) ($old['rating'] ?? '');
                     <textarea name="text" id="text" rows="4" placeholder="Поделитесь впечатлениями"><?= e((string) ($old['text'] ?? '')) ?></textarea>
                 </div>
 
-                <button type="submit" class="btn btn-gold">Отправить</button>
+                <button type="submit" class="btn btn-accent">Отправить</button>
             </form>
         </div>
     </div>

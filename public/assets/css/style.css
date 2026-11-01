@@ -67,7 +67,7 @@ a { color: var(--blue); text-decoration: none; }
 .header-inner { display: flex; align-items: center; gap: 16px; height: 72px; }
 .logo { font-size: 20px; font-weight: 700; letter-spacing: 0.5px; color: #fff; }
 .logo span {
-    background-image: linear-gradient(135deg, #5a626b 0%, #7e8891 35%, #eef2f5 50%, #7e8891 65%, #5a626b 100%);
+    background-image: linear-gradient(135deg, #5a626b 0%, #7e8891 15%, #eef2f5 50%, #7e8891 85%, #5a626b 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -101,17 +101,20 @@ a { color: var(--blue); text-decoration: none; }
     padding: 12px 24px;
     border-radius: var(--radius);
     font-weight: 600;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
     transition: background 0.2s, transform 0.1s;
 }
-.btn-accent { background: var(--blue); color: #fff; }
+.btn-accent { background: var(--blue); color: #fff; border: 1px solid var(--blue); }
 .btn-accent:hover { background: #1b44c2; }
 .btn-gold {
     background-color: #7e8891;
     background-image:
         url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E"),
-        linear-gradient(135deg, #505761 0%, #7e8891 35%, #a8b0b9 50%, #7e8891 65%, #505761 100%);
+        linear-gradient(135deg, #505761 0%, #7e8891 15%, #a8b0b9 50%, #7e8891 85%, #505761 100%);
     background-size: 160px 160px, auto;
-    color: #fff;
+    color: var(--text);
 }
 .btn-gold:hover { filter: brightness(0.88); }
 
@@ -140,7 +143,7 @@ a { color: var(--blue); text-decoration: none; }
     background-color: #7e8891;
     background-image:
         url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E"),
-        linear-gradient(135deg, #505761 0%, #7e8891 35%, #a8b0b9 50%, #7e8891 65%, #505761 100%);
+        linear-gradient(135deg, #505761 0%, #7e8891 15%, #a8b0b9 50%, #7e8891 85%, #505761 100%);
     background-size: 160px 160px, auto;
     border: 1px solid #7e8891;
     border-radius: var(--radius);
@@ -164,7 +167,7 @@ a { color: var(--blue); text-decoration: none; }
     background-color: #7e8891;
     background-image:
         url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E"),
-        linear-gradient(135deg, #505761 0%, #7e8891 35%, #a8b0b9 50%, #7e8891 65%, #505761 100%);
+        linear-gradient(135deg, #505761 0%, #7e8891 15%, #a8b0b9 50%, #7e8891 85%, #505761 100%);
     background-size: 160px 160px, auto;
     border: 1px solid #7e8891;
     border-radius: var(--radius);
@@ -214,9 +217,22 @@ a { color: var(--blue); text-decoration: none; }
 /* --- Форма записи (квиз) --- */
 .lead { color: var(--text-muted); margin-bottom: 24px; }
 .booking-steps { list-style: none; display: flex; gap: 8px; flex-wrap: wrap; margin: 0 0 24px; padding: 0; }
-.booking-steps li { flex: 1 1 auto; min-width: 140px; padding: 12px 16px; background: var(--bg-muted); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text-muted); font-weight: 600; }
+.booking-steps li {
+    flex: 1 1 auto;
+    min-width: 140px;
+    padding: 12px 16px;
+    background-color: #7e8891;
+    background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E"),
+        linear-gradient(135deg, #505761 0%, #7e8891 15%, #a8b0b9 50%, #7e8891 85%, #505761 100%);
+    background-size: 160px 160px, auto;
+    border: 1px solid #7e8891;
+    border-radius: var(--radius);
+    color: var(--text);
+    font-weight: 600;
+}
 .booking-steps li span { display: inline-block; width: 24px; height: 24px; line-height: 24px; text-align: center; border-radius: 50%; background: var(--border); color: var(--text); margin-right: 8px; }
-.booking-steps li.active { background: var(--gold); color: #fff; border-color: var(--gold); }
+.booking-steps li.active { color: #fff; border-color: #fff; }
 .booking-steps li.active span { background: rgba(255, 255, 255, 0.25); color: #fff; }
 .booking-steps li.done { color: var(--text); }
 .booking-step { margin-bottom: 24px; }
@@ -232,7 +248,7 @@ a { color: var(--blue); text-decoration: none; }
     background-color: #7e8891;
     background-image:
         url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E"),
-        linear-gradient(135deg, #505761 0%, #7e8891 35%, #a8b0b9 50%, #7e8891 65%, #505761 100%);
+        linear-gradient(135deg, #505761 0%, #7e8891 15%, #a8b0b9 50%, #7e8891 85%, #505761 100%);
     background-size: 160px 160px, auto;
     border: 1px solid #7e8891;
     border-radius: 8px;
@@ -240,13 +256,15 @@ a { color: var(--blue); text-decoration: none; }
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 12px;
     color: var(--text);
 }
-.option input { margin: 0; }
+.option input { margin: 0 5px 0 0; }
 .option:has(input:checked) { border-color: #fff; }
-.service-card { cursor: pointer; }
-.service-card input { margin-bottom: 8px; }
+.service-card { cursor: pointer; display: flex; align-items: center; gap: 12px; padding: 12px; }
+.service-card input { margin: 0 5px 0 0; flex-shrink: 0; }
+.service-card h3 { margin: 0; flex: 1; }
+.service-card .price { margin: 0; }
 .form-errors { background: #fdecea; border: 1px solid #f5c6cb; color: #a94442; border-radius: var(--radius); padding: 16px; margin-bottom: 24px; }
 .form-errors ul { margin: 8px 0 0; padding-left: 20px; }
 .flash { background: #e6f4ea; border: 1px solid #b7dfc4; color: #1e7e34; border-radius: var(--radius); padding: 16px; margin-bottom: 24px; }
@@ -297,21 +315,22 @@ a { color: var(--blue); text-decoration: none; }
     background-color: #7e8891;
     background-image:
         url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E"),
-        linear-gradient(135deg, #505761 0%, #7e8891 35%, #a8b0b9 50%, #7e8891 65%, #505761 100%);
+        linear-gradient(135deg, #505761 0%, #7e8891 15%, #a8b0b9 50%, #7e8891 85%, #505761 100%);
     background-size: 160px 160px, auto;
     border: 1px solid #7e8891;
     border-radius: 8px;
-    padding: 8px 12px;
+    padding: 12px;
     cursor: pointer;
     display: flex;
-    gap: 8px;
+    gap: 12px;
     align-items: center;
     color: var(--text);
 }
+.calculator-service input { margin: 0 5px 0 0; }
 .calculator-total { font-size: 18px; margin-top: 8px; }
 .calculator-total strong {
     font-size: 24px;
-    background-image: linear-gradient(135deg, #5a626b 0%, #7e8891 35%, #eef2f5 50%, #7e8891 65%, #5a626b 100%);
+    background-image: linear-gradient(135deg, #5a626b 0%, #7e8891 15%, #eef2f5 50%, #7e8891 85%, #5a626b 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -330,7 +349,7 @@ a { color: var(--blue); text-decoration: none; }
     background-color: #7e8891;
     background-image:
         url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E"),
-        linear-gradient(135deg, #505761 0%, #7e8891 35%, #a8b0b9 50%, #7e8891 65%, #505761 100%);
+        linear-gradient(135deg, #505761 0%, #7e8891 15%, #a8b0b9 50%, #7e8891 85%, #505761 100%);
     background-size: 160px 160px, auto;
     border: 1px solid #7e8891;
     border-radius: var(--radius);
@@ -371,15 +390,11 @@ a { color: var(--blue); text-decoration: none; }
 .site-main .breadcrumbs .sep { color: #9ca3af; }
 .site-main .field-group small { color: #cbd5e1; }
 
-/* Белые элементы — тёмный текст (читаемы на тёмном фоне) */
-.site-main .booking-steps li:not(.active),
-.site-main .service-card {
-    color: var(--text);
-    background: var(--bg);
-}
-/* Карточки, блоки, чекбоксы и опции — тёмный текст, металлический фон */
+/* Металлические элементы — тёмный текст */
 .site-main .card,
 .site-main .features li,
+.site-main .booking-steps li,
+.site-main .service-card,
 .site-main .calculator-service,
 .site-main .option { color: var(--text); }
 

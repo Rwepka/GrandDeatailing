@@ -33,6 +33,6 @@ $crumbs = [
 
         <p><a href="<?= e(url('/services')) ?>">← Все услуги</a></p>
 
-        <a href="<?= e(url('/booking')) ?>" class="btn btn-gold">Записаться</a>
+        <a href="<?= e(url('/booking')) ?>" class="btn btn-accent">Записаться</a>
     </div>
 </section>

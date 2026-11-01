@@ -84,7 +84,7 @@ $crumbs = [
                     <textarea name="text" id="text" rows="4" placeholder="Ваш вопрос или пожелание"><?= e((string) ($old['text'] ?? '')) ?></textarea>
                 </div>
 
-                <button type="submit" class="btn btn-gold">Отправить</button>
+                <button type="submit" class="btn btn-accent">Отправить</button>
             </form>
         </div>
     </div>

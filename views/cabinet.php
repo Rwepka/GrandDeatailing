@@ -30,7 +30,7 @@ $crumbs = [
 
                 <?php if (empty($bookings)): ?>
                     <p>Записей пока нет</p>
-                    <a href="<?= e(url('/booking')) ?>" class="btn btn-gold">Записаться</a>
+                    <a href="<?= e(url('/booking')) ?>" class="btn btn-accent">Записаться</a>
                 <?php else: ?>
                     <div class="cards">
                         <?php foreach ($bookings as $booking): ?>

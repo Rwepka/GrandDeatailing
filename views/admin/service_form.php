@@ -64,7 +64,7 @@ $selectedCategoryId = $old['category_id'] ?? $service['category_id'] ?? '';
             </select>
         </div>
 
-        <button type="submit" class="btn btn-gold">Сохранить</button>
+        <button type="submit" class="btn btn-accent">Сохранить</button>
         <a href="<?= e(url('/admin/services')) ?>" class="btn btn-outline">Отмена</a>
     </form>
 </div>

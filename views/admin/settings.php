@@ -29,7 +29,7 @@ $flash = $flash ?? null;
         </div>
     <?php endforeach; ?>
 
-    <button type="submit" class="btn btn-gold">Сохранить</button>
+    <button type="submit" class="btn btn-accent">Сохранить</button>
 </form>
 
 <div class="modal-overlay" id="settings-modal" hidden>
@@ -39,7 +39,7 @@ $flash = $flash ?? null;
         <ul class="modal-changes" id="settings-changes"></ul>
         <div class="modal-actions">
             <button type="button" class="btn btn-outline" id="settings-cancel">Отмена</button>
-            <button type="button" class="btn btn-gold" id="settings-confirm">Подтвердить</button>
+            <button type="button" class="btn btn-accent" id="settings-confirm">Подтвердить</button>
         </div>
     </div>
 </div>

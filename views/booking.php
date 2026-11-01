@@ -114,7 +114,7 @@ $crumbs = [
                 </div>
                 <div class="step-actions">
                     <button type="button" class="btn btn-outline" data-prev>Назад</button>
-                    <button type="submit" class="btn btn-gold">Отправить заявку</button>
+                    <button type="submit" class="btn btn-accent">Отправить заявку</button>
                 </div>
             </div>
         </form>

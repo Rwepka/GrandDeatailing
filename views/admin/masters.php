@@ -9,7 +9,7 @@ $masters = $masters ?? [];
 $flash = $flash ?? null;
 ?>
 <h1>Мастера</h1>
-<a href="<?= e(url('/admin/masters/create')) ?>" class="btn btn-accent">Добавить мастера</a>
+<a href="<?= e(url('/admin/masters/create')) ?>" class="btn btn-accent" style="margin-bottom: 16px;">Добавить мастера</a>
 
 <?php if (!empty($flash)): ?>
     <div class="flash" role="status"><?= e((string) $flash) ?></div>

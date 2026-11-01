@@ -41,13 +41,13 @@
     background-color: #7e8891;
     background-image:
         url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E"),
-        linear-gradient(135deg, #505761 0%, #7e8891 35%, #a8b0b9 50%, #7e8891 65%, #505761 100%);
+        linear-gradient(135deg, #505761 0%, #7e8891 15%, #a8b0b9 50%, #7e8891 85%, #505761 100%);
     background-size: 160px 160px, auto;
     border: 1px solid #7e8891;
     border-radius: var(--radius);
     padding: 20px;
 }
-.admin-kpi .value { font-size: 30px; font-weight: 700; color: #fff; }
+.admin-kpi .value { font-size: 30px; font-weight: 700; color: var(--text); }
 .admin-kpi .label { color: var(--text); margin-top: 4px; }
 
 /* Таблицы */
@@ -114,6 +114,17 @@
 
 .income-total { margin-top: 16px; padding: 14px 18px; background: #1f2330; border: 1px solid #3a4150; border-radius: 10px; font-size: 15px; color: #e5e7eb; }
 .income-total strong { font-size: 22px; color: #a8b0b9; margin-left: 4px; }
+.income-panel { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 16px; }
+.income-panel input[type="date"] {
+    padding: 6px 12px;
+    font-size: 13px;
+    font-family: inherit;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+}
 .table-search { width: 100%; max-width: 360px; padding: 10px 12px; margin-bottom: 16px; border: 1px solid #E5E7EB; border-radius: 8px; font-size: 14px; }
 .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); display: flex; align-items: center; justify-content: center; z-index: 1000; }
 .modal-overlay[hidden] { display: none; }

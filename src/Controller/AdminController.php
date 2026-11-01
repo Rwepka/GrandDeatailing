@@ -6,10 +6,22 @@ namespace App\Controller;
 use App\Core\Database;
 use App\Core\View;
 use App\Model\Booking;
+use App\Model\BookingItem;
+use App\Model\Service;
 use App\Model\User;
 
 class AdminController
 {
+    /** @var array<int, string> */
+    private const CAR_CLASSES = [
+        'Седан',
+        'Кроссовер / SUV',
+        'Минивэн',
+        'Купе / Спорт',
+        'Универсал',
+        'Хэтчбек',
+    ];
+
     /**
      * Дашборд админ-панели: статистика и последние заявки.
      */
@@ -65,6 +77,189 @@ class AdminController
             'bookings' => Booking::latestWithCost(),
             'flash' => flash(),
         ]);
+    }
+
+    public function createBooking(): void
+    {
+        requireStaff();
+
+        View::renderAdmin('booking_form', [
+            'title' => 'Новая заявка',
+            'services' => Service::active(),
+            'carClasses' => self::CAR_CLASSES,
+            'errors' => [],
+            'old' => [],
+        ]);
+    }
+
+    public function storeBooking(): void
+    {
+        requireStaff();
+
+        if (!csrf_verify($_POST['csrf_token'] ?? null)) {
+            http_response_code(419);
+            redirect('/admin/bookings');
+        }
+
+        $services = Service::active();
+        $old = [
+            'name' => trim((string) ($_POST['name'] ?? '')),
+            'phone' => trim((string) ($_POST['phone'] ?? '')),
+            'car_class' => trim((string) ($_POST['car_class'] ?? '')),
+            'brand_model' => trim((string) ($_POST['brand_model'] ?? '')),
+            'pref_date' => trim((string) ($_POST['pref_date'] ?? '')),
+            'pref_time' => trim((string) ($_POST['pref_time'] ?? '')),
+            'comment' => trim((string) ($_POST['comment'] ?? '')),
+            'service_ids' => is_array($_POST['service_ids'] ?? null) ? array_map('intval', $_POST['service_ids']) : [],
+        ];
+
+        $errors = [];
+
+        // --- Имя ---
+        $name = $old['name'];
+        if ($name === '') {
+            $errors[] = 'Укажите имя клиента.';
+        } elseif ((function_exists('mb_strlen') ? mb_strlen($name) : strlen($name)) > 100) {
+            $errors[] = 'Имя не должно быть длиннее 100 символов.';
+        }
+
+        // --- Телефон ---
+        $phoneRaw = $old['phone'];
+        $phone = '';
+        if ($phoneRaw === '') {
+            $errors[] = 'Укажите номер телефона.';
+        } else {
+            $phone = normalize_phone($phoneRaw);
+            $digits = (string) preg_replace('/\D+/', '', $phone);
+            if (preg_match('/^\d{10,15}$/', $digits) !== 1) {
+                $errors[] = 'Номер телефона должен содержать от 10 до 15 цифр.';
+            }
+        }
+
+        // --- Услуги ---
+        $activeById = [];
+        foreach ($services as $service) {
+            $activeById[(int) $service['id']] = $service;
+        }
+        $serviceIds = [];
+        $rawServiceIds = is_array($_POST['service_ids'] ?? null) ? $_POST['service_ids'] : [];
+        foreach ($rawServiceIds as $sid) {
+            $sid = (int) $sid;
+            if ($sid > 0 && isset($activeById[$sid])) {
+                $serviceIds[$sid] = $sid;
+            }
+        }
+        if (count($serviceIds) === 0) {
+            $errors[] = 'Выберите хотя бы одну услугу.';
+        }
+
+        // --- Класс авто ---
+        $carClass = $old['car_class'];
+        if (!in_array($carClass, self::CAR_CLASSES, true)) {
+            $errors[] = 'Выберите класс автомобиля.';
+        }
+
+        // --- Марка/модель ---
+        $brandModel = $old['brand_model'];
+
+        // --- Дата ---
+        $prefDate = null;
+        $prefDateRaw = $old['pref_date'];
+        if ($prefDateRaw !== '') {
+            $dateObj = \DateTime::createFromFormat('Y-m-d', $prefDateRaw);
+            $dateErr = \DateTime::getLastErrors();
+            $dateClean = $dateErr === false || ($dateErr['warning_count'] === 0 && $dateErr['error_count'] === 0);
+            if ($dateObj === false || !$dateClean || $dateObj->format('Y-m-d') !== $prefDateRaw) {
+                $errors[] = 'Дата должна быть в формате ГГГГ-ММ-ДД.';
+            } else {
+                $prefDate = $dateObj->format('Y-m-d');
+            }
+        }
+
+        // --- Время ---
+        $prefTime = null;
+        $prefTimeRaw = $old['pref_time'];
+        if ($prefTimeRaw !== '') {
+            $timeObj = null;
+            foreach (['H:i', 'H:i:s'] as $format) {
+                $candidate = \DateTime::createFromFormat($format, $prefTimeRaw);
+                $timeErr = \DateTime::getLastErrors();
+                $timeClean = $timeErr === false || ($timeErr['warning_count'] === 0 && $timeErr['error_count'] === 0);
+                if ($candidate !== false && $timeClean) {
+                    $timeObj = $candidate;
+                    break;
+                }
+            }
+            if ($timeObj === null) {
+                $errors[] = 'Время должно быть в формате ЧЧ:ММ (например 14:30).';
+            } else {
+                $prefTime = $timeObj->format('H:i:s');
+            }
+        }
+
+        // --- Комментарий ---
+        $comment = trim((string) ($_POST['comment'] ?? ''));
+        if ($comment === '') {
+            $comment = null;
+        }
+
+        $carInfo = $carClass;
+        if ($brandModel !== '') {
+            $carInfo .= ' — ' . $brandModel;
+        }
+
+        if ($errors !== []) {
+            View::renderAdmin('booking_form', [
+                'title' => 'Новая заявка',
+                'services' => $services,
+                'carClasses' => self::CAR_CLASSES,
+                'errors' => $errors,
+                'old' => $old,
+            ]);
+            return;
+        }
+
+        $pdo = Database::connection();
+        try {
+            $pdo->beginTransaction();
+
+            $bookingId = Booking::create([
+                'user_id' => null,
+                'client_name' => $name,
+                'client_phone' => $phone,
+                'car_info' => $carInfo,
+                'pref_date' => $prefDate,
+                'pref_time' => $prefTime,
+                'comment' => $comment,
+            ]);
+
+            foreach ($serviceIds as $sid) {
+                $service = $activeById[$sid];
+                $rawPrice = $service['price_from'] ?? null;
+                BookingItem::create([
+                    'booking_id' => $bookingId,
+                    'service_id' => $sid,
+                    'price' => ($rawPrice === null || $rawPrice === '') ? null : (float) $rawPrice,
+                ]);
+            }
+
+            $pdo->commit();
+        } catch (\Throwable $e) {
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+            View::renderAdmin('booking_form', [
+                'title' => 'Новая заявка',
+                'services' => $services,
+                'carClasses' => self::CAR_CLASSES,
+                'errors' => ['Не удалось сохранить заявку. Попробуйте ещё раз.'],
+                'old' => $old,
+            ]);
+            return;
+        }
+
+        setFlash('Заявка создана.');
+        redirect('/admin/bookings');
     }
 
     /**

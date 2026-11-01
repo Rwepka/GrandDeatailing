@@ -21,7 +21,6 @@ $current = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/';
         <a href="<?= e(url('/')) ?>" class="logo">GRAND <span>DETAILING</span></a>
         <nav class="admin-nav">
             <?php if (isMaster()): ?>
-                <a href="<?= e(url('/cabinet')) ?>" class="<?= str_starts_with($current, '/cabinet') ? 'active' : '' ?>">Личный кабинет</a>
                 <a href="<?= e(url('/admin/bookings')) ?>" class="<?= str_starts_with($current, '/admin/bookings') ? 'active' : '' ?>">Заявки</a>
             <?php else: ?>
                 <a href="<?= e(url('/admin')) ?>" class="<?= $current === '/admin' ? 'active' : '' ?>">Дашборд</a>
@@ -35,7 +34,9 @@ $current = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/';
             <?php endif; ?>
         </nav>
         <div class="admin-sidebar-footer">
-            <a href="<?= e(url('/')) ?>">← На сайт</a>
+            <?php if (!isMaster()): ?>
+                <a href="<?= e(url('/')) ?>">← На сайт</a>
+            <?php endif; ?>
             <form method="POST" action="<?= e(url('/logout')) ?>">
                 <?= csrf_field() ?>
                 <button type="submit" class="btn btn-outline">Выйти</button>

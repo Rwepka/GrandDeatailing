@@ -10,9 +10,9 @@ $old = $old ?? [];
 ?>
 <section class="section">
     <div class="container">
+        <h1>Вход</h1>
+        <p class="lead">Войдите в личный кабинет, чтобы управлять записями.</p>
         <div class="card">
-            <h1>Вход</h1>
-            <p class="lead">Войдите в личный кабинет, чтобы управлять записями.</p>
 
             <?php if (!empty($errors)): ?>
                 <div class="form-errors" role="alert">
@@ -45,7 +45,7 @@ $old = $old ?? [];
                     </label>
                 </div>
 
-                <button type="submit" class="btn btn-gold">Войти</button>
+                <button type="submit" class="btn btn-accent">Войти</button>
             </form>
 
             <p>Нет аккаунта? <a href="<?= e(url('/register')) ?>">Зарегистрироваться</a></p>
