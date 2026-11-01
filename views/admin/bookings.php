@@ -16,7 +16,7 @@ $statuses = [
 ];
 ?>
 <h1>Заявки</h1>
-<a href="<?= e(url('/admin/bookings/create')) ?>" class="btn btn-accent">Создать заявку</a>
+<a href="<?= e(url('/admin/bookings/create')) ?>" class="btn btn-accent btn-create">Создать заявку</a>
 
 <?php if (!empty($flash)): ?>
     <div class="flash" role="status"><?= e((string) $flash) ?></div>

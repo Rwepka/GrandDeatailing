@@ -81,6 +81,7 @@
 .admin-nav-toggle { display: none; }
 .admin-overlay { display: none; }
 @media (max-width: 820px) {
+    .btn-create { margin-bottom: 16px; }
     .admin-nav-toggle {
         display: block;
         position: fixed;
