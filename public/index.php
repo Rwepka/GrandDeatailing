@@ -14,6 +14,7 @@ require BASE_PATH . '/src/bootstrap.php';
 use App\Core\Router;
 use App\Controller\HomeController;
 use App\Controller\ServiceController;
+use App\Controller\SitemapController;
 use App\Controller\BookingController;
 use App\Controller\ContactController;
 use App\Controller\NewsController;
@@ -44,6 +45,7 @@ $router->get('/reviews', [ReviewController::class, 'index']);
 $router->get('/reviews/create', [ReviewController::class, 'create']);
 $router->post('/reviews', [ReviewController::class, 'store']);
 $router->get('/news', [NewsController::class, 'index']);
+$router->get('/sitemap.xml', [SitemapController::class, 'index']);
 
 // --- Авторизация ---
 $router->get('/register', [AuthController::class, 'showRegister']);

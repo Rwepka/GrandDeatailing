@@ -36,3 +36,13 @@ $crumbs = [
         <a href="<?= e(url('/booking')) ?>" class="btn btn-accent">Записаться</a>
     </div>
 </section>
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "name": "<?= e((string) $service['title']) ?>",
+    "serviceType": "<?= e($categoryTitle ?? 'Детейлинг') ?>",
+    "provider": { "@type": "AutoWash", "name": "<?= e(config('app.name')) ?>" },
+    "areaServed": "Туапсе"
+}
+</script>

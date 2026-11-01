@@ -1,7 +1,11 @@
 <?php
 /** @var string|null $title */
+/** @var string|null $metaDescription */
 $title = $title ?? (string) config('app.name');
 $current = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/';
+$metaDescription = $metaDescription ?? 'Детейлинг-студия GRAND DETAILING в Туапсе: полировка кузова, химчистка салона, керамика и защитные покрытия. Онлайн-запись.';
+$baseUrl = rtrim((string) config('app.url'), '/');
+$absoluteUrl = $baseUrl . ($current === '/' ? '/' : $current);
 ?>
 <!doctype html>
 <html lang="ru">
@@ -14,6 +18,43 @@ $current = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/';
     <link rel="apple-touch-icon" href="<?= e(url('/apple-touch-icon.png')) ?>">
     <link rel="manifest" href="<?= e(url('/site.webmanifest')) ?>">
     <meta name="theme-color" content="#5e5c64">
+    <meta name="description" content="<?= e($metaDescription) ?>">
+    <link rel="canonical" href="<?= e($absoluteUrl) ?>">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="<?= e(config('app.name')) ?>">
+    <meta property="og:title" content="<?= e($title) ?>">
+    <meta property="og:description" content="<?= e($metaDescription) ?>">
+    <meta property="og:url" content="<?= e($absoluteUrl) ?>">
+    <meta property="og:image" content="<?= e($baseUrl . url('/apple-touch-icon.png')) ?>">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "AutoWash",
+        "name": "<?= e(config('app.name')) ?>",
+        "image": "<?= e($baseUrl . url('/apple-touch-icon.png')) ?>",
+        "url": "<?= e($baseUrl . url('/')) ?>",
+        "telephone": "<?= e(normalize_phone((string) setting('phone', '+7 (988) 413-07-77'))) ?>",
+        "priceRange": "₽₽",
+        "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "<?= e((string) setting('address', 'г. Туапсе, ул. Богдана Хмельницкого, 16')) ?>",
+            "addressLocality": "Туапсе",
+            "addressRegion": "Краснодарский край",
+            "addressCountry": "RU"
+        },
+        "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": <?= e((string) setting('map_lat', '44.104854')) ?>,
+            "longitude": <?= e((string) setting('map_lng', '39.087091')) ?>
+        },
+        "openingHours": "Mo-Su 09:00-20:00",
+        "sameAs": [
+            "https://t.me/Grant0201",
+            "https://vk.ru/granddeta1ling",
+            "https://www.instagram.com/avjihanter/"
+        ]
+    }
+    </script>
     <link rel="stylesheet" href="<?= e(asset('css/style.css')) ?>">
 </head>
 <body>

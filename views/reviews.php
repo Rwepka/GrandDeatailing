@@ -40,3 +40,26 @@ $crumbs = [
         <p class="lead">Чтобы оставить отзыв, воспользуйтесь нашими услугами хотя бы один раз, перейдите в личный кабинет и нажмите кнопку «Оставить отзыв» под оказанной услугой.</p>
     </div>
 </section>
+<?php
+$reviewCount = count($reviews);
+$avgRating = 0;
+if ($reviewCount > 0) {
+    $sum = 0;
+    foreach ($reviews as $r) {
+        $sum += (int) ($r['rating'] ?? 0);
+    }
+    $avgRating = round($sum / $reviewCount, 1);
+}
+?>
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "AutoWash",
+    "name": "<?= e(config('app.name')) ?>",
+    "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "<?= e((string) $avgRating) ?>",
+        "reviewCount": "<?= e((string) $reviewCount) ?>"
+    }
+}
+</script>
