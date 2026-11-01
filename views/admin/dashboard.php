@@ -165,6 +165,16 @@ $statusLabels = [
     document.querySelectorAll('[data-range]').forEach(function (btn) {
         btn.addEventListener('click', function () {
             const kind = btn.getAttribute('data-range');
+            if (kind === 'custom') {
+                const from = fromInput.value;
+                const to = toInput.value;
+                if (!from || !to) {
+                    alert('Укажите даты диапазона.');
+                    return;
+                }
+                loadIncome(from, to);
+                return;
+            }
             const range = rangeFor(kind);
             fromInput.value = range.from;
             toInput.value = range.to;

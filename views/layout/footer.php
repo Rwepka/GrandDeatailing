@@ -10,7 +10,7 @@
 <?php endif; ?>
 <footer class="site-footer">
     <div class="container">
-        <p>GRAND DETAILING — детейлинг-студия · 2026</p>
+        <p>GRAND DETAILING — детейлинг-студия · 2023</p>
     </div>
 </footer>
 <script src="<?= e(asset('js/main.js')) ?>"></script>

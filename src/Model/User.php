@@ -67,4 +67,16 @@ class User extends Model
         $stmt = Database::connection()->prepare('UPDATE users SET password_hash = ? WHERE id = ?');
         $stmt->execute([$passwordHash, $id]);
     }
+
+    public static function updateProfile(int $id, string $name, ?string $email, string $phone): void
+    {
+        $stmt = Database::connection()->prepare('UPDATE users SET name = ?, email = ?, phone = ? WHERE id = ?');
+        $stmt->execute([$name, $email, $phone, $id]);
+    }
+
+    public static function delete(int $id): void
+    {
+        $stmt = Database::connection()->prepare('DELETE FROM users WHERE id = ?');
+        $stmt->execute([$id]);
+    }
 }

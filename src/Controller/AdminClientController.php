@@ -29,4 +29,27 @@ class AdminClientController
 
         View::renderAdmin('clients', ['title' => 'Клиенты', 'clients' => $clients]);
     }
+
+    /**
+     * Удаление клиента (каскад в БД отвяжет заявки/отзывы и удалит автомобили).
+     */
+    public function delete(int $id): void
+    {
+        requireAdmin();
+
+        if (!csrf_verify($_POST['csrf_token'] ?? null)) {
+            http_response_code(419);
+            redirect('/admin/clients');
+        }
+
+        $clientRoleId = (int) (Database::connection()->query("SELECT id FROM roles WHERE code = 'client'")->fetchColumn() ?: 1);
+        $user = User::find($id);
+
+        if ($user !== null && (int) $user['role_id'] === $clientRoleId) {
+            User::delete($id);
+            setFlash('Клиент удалён.');
+        }
+
+        redirect('/admin/clients');
+    }
 }

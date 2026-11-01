@@ -56,12 +56,13 @@ $crumbs = [
             <?php endif; ?>
         </div>
 
+        <?php $mapLng = (string) setting('map_lng', '39.087091'); $mapLat = (string) setting('map_lat', '44.104854'); ?>
         <div class="map">
-            <iframe src="https://yandex.ru/map-widget/v1/?ll=<?= e(setting('map_lng', '39.087091')) ?>%2C<?= e(setting('map_lat', '44.104854')) ?>&z=17" width="100%" height="400" style="border:0;" allowfullscreen loading="lazy"></iframe>
+            <iframe src="https://yandex.ru/map-widget/v1/?ll=<?= e($mapLng) ?>%2C<?= e($mapLat) ?>&z=17&mode=whatshere&whatshere%5Bpoint%5D=<?= e($mapLng) ?>%2C<?= e($mapLat) ?>&whatshere%5Bzoom%5D=17" width="100%" height="400" style="border:0;" allowfullscreen loading="lazy"></iframe>
         </div>
 
+        <h2>Обратная связь</h2>
         <div class="card">
-            <h2>Обратная связь</h2>
             <form method="POST" action="<?= e(url('/contacts')) ?>" novalidate>
                 <?= csrf_field() ?>
                 <input type="text" name="website" value="" class="hp-field" tabindex="-1" autocomplete="off" aria-hidden="true">

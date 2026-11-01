@@ -36,7 +36,7 @@ $crumbs = [
             </div>
         <?php endif; ?>
 
-        <div class="card">
+        <div class="card card-plain">
             <h2>Телефон</h2>
             <form method="POST" action="<?= e(url('/cabinet/security/phone')) ?>" novalidate>
                 <?= csrf_field() ?>
@@ -48,7 +48,7 @@ $crumbs = [
             </form>
         </div>
 
-        <div class="card">
+        <div class="card card-plain">
             <h2>Email</h2>
             <form method="POST" action="<?= e(url('/cabinet/security/email')) ?>" novalidate>
                 <?= csrf_field() ?>
@@ -60,7 +60,7 @@ $crumbs = [
             </form>
         </div>
 
-        <div class="card">
+        <div class="card card-plain">
             <h2>Пароль</h2>
             <form method="POST" action="<?= e(url('/cabinet/security/password')) ?>" novalidate>
                 <?= csrf_field() ?>

@@ -79,7 +79,10 @@ $router->post('/admin/messages/{id}/read', [AdminMessageController::class, 'mark
 $router->get('/admin/masters', [AdminMasterController::class, 'index']);
 $router->get('/admin/masters/create', [AdminMasterController::class, 'create']);
 $router->post('/admin/masters', [AdminMasterController::class, 'store']);
+$router->get('/admin/masters/{id}/edit', [AdminMasterController::class, 'edit']);
+$router->post('/admin/masters/{id}/update', [AdminMasterController::class, 'update']);
 $router->get('/admin/clients', [AdminClientController::class, 'index']);
+$router->post('/admin/clients/{id}/delete', [AdminClientController::class, 'delete']);
 $router->get('/admin/settings', [AdminSettingsController::class, 'index']);
 $router->post('/admin/settings', [AdminSettingsController::class, 'store']);
 

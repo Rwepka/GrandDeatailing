@@ -1,15 +1,18 @@
 <?php
 /**
- * Форма создания мастера (админ-панель).
+ * Форма создания/редактирования мастера (админ-панель).
  *
  * @var array<int, string>   $errors
  * @var array<string, mixed> $old
+ * @var array<string, mixed>|null $master
  */
 $errors = $errors ?? [];
 $old = $old ?? [];
+$master = $master ?? null;
+$isEdit = !empty($master);
 ?>
 <div class="card">
-    <h1>Новый мастер</h1>
+    <h1><?= $isEdit ? 'Редактировать мастера' : 'Новый мастер' ?></h1>
 
     <?php if (!empty($errors)): ?>
         <div class="form-errors" role="alert">
@@ -22,7 +25,7 @@ $old = $old ?? [];
         </div>
     <?php endif; ?>
 
-    <form method="POST" action="<?= e(url('/admin/masters')) ?>" novalidate>
+    <form method="POST" action="<?= e($isEdit ? url('/admin/masters/' . $master['id'] . '/update') : url('/admin/masters')) ?>" novalidate>
         <?= csrf_field() ?>
 
         <div class="field-group">
@@ -41,11 +44,11 @@ $old = $old ?? [];
         </div>
 
         <div class="field-group">
-            <label for="password">Пароль <small>(минимум 8 символов)</small></label>
-            <input type="password" name="password" id="password" minlength="8">
+            <label for="password"><?= $isEdit ? 'Новый пароль <small>(оставьте пустым, чтобы не менять)</small>' : 'Пароль <small>(минимум 8 символов)</small>' ?></label>
+            <input type="password" name="password" id="password" <?= $isEdit ? '' : 'minlength="8"' ?>>
         </div>
 
-        <button type="submit" class="btn btn-gold">Создать</button>
+        <button type="submit" class="btn btn-gold"><?= $isEdit ? 'Сохранить' : 'Создать' ?></button>
         <a href="<?= e(url('/admin/masters')) ?>" class="btn btn-outline">Отмена</a>
     </form>
 </div>

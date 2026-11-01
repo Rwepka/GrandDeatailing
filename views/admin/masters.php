@@ -24,6 +24,7 @@ $flash = $flash ?? null;
             <th>Email</th>
             <th>Телефон</th>
             <th>Дата создания</th>
+            <th>Действия</th>
         </tr>
     </thead>
     <tbody>
@@ -34,12 +35,13 @@ $flash = $flash ?? null;
                 <td><?= e((string) ($master['email'] ?? '')) ?></td>
                 <td><?= e((string) ($master['phone'] ?? '')) ?></td>
                 <td><?= e((string) ($master['created_at'] ?? '')) ?></td>
+                <td><a href="<?= e(url('/admin/masters/' . $master['id'] . '/edit')) ?>" class="btn btn-outline btn-sm">Редактировать</a></td>
             </tr>
         <?php endforeach; ?>
 
         <?php if ($masters === []): ?>
             <tr>
-                <td colspan="5">Мастеров пока нет.</td>
+                <td colspan="6">Мастеров пока нет.</td>
             </tr>
         <?php endif; ?>
     </tbody>

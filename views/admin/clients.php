@@ -23,6 +23,7 @@ $clients = $clients ?? [];
                 <th>Email</th>
                 <th>Автомобили</th>
                 <th>Заявки</th>
+                <th>Действия</th>
             </tr>
         </thead>
         <tbody>
@@ -34,6 +35,12 @@ $clients = $clients ?? [];
                     <td><?= e((string) ($client['email'] ?? '')) ?></td>
                     <td><?= e((string) ($client['cars_count'] ?? 0)) ?></td>
                     <td><?= e((string) ($client['bookings_count'] ?? 0)) ?></td>
+                    <td>
+                        <form method="POST" action="<?= e(url('/admin/clients/' . $client['id'] . '/delete')) ?>" class="inline-form" onsubmit="return confirm('Удалить клиента? Действие необратимо.');">
+                            <?= csrf_field() ?>
+                            <button type="submit" class="btn btn-danger btn-sm">Удалить</button>
+                        </form>
+                    </td>
                 </tr>
             <?php endforeach; ?>
         </tbody>
