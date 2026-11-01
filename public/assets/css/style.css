@@ -417,3 +417,8 @@ body:not(.admin-body) {
     flex-direction: column;
 }
 body:not(.admin-body) .site-main { flex: 1 0 auto; }
+
+/* --- Новости --- */
+.news-item { margin-bottom: 16px; }
+.news-item h2 { color: #fff; margin-bottom: 12px; }
+.news-card .news-content { color: var(--text); }

@@ -16,12 +16,14 @@ use App\Controller\HomeController;
 use App\Controller\ServiceController;
 use App\Controller\BookingController;
 use App\Controller\ContactController;
+use App\Controller\NewsController;
 use App\Controller\ReviewController;
 use App\Controller\AuthController;
 use App\Controller\CabinetController;
 use App\Controller\AdminController;
 use App\Controller\AdminServiceController;
 use App\Controller\AdminReviewController;
+use App\Controller\AdminPostController;
 use App\Controller\AdminMessageController;
 use App\Controller\AdminMasterController;
 use App\Controller\AdminClientController;
@@ -41,6 +43,7 @@ $router->post('/contacts', [ContactController::class, 'store']);
 $router->get('/reviews', [ReviewController::class, 'index']);
 $router->get('/reviews/create', [ReviewController::class, 'create']);
 $router->post('/reviews', [ReviewController::class, 'store']);
+$router->get('/news', [NewsController::class, 'index']);
 
 // --- Авторизация ---
 $router->get('/register', [AuthController::class, 'showRegister']);
@@ -76,6 +79,10 @@ $router->post('/admin/services/{id}', [AdminServiceController::class, 'update'])
 $router->post('/admin/services/{id}/toggle', [AdminServiceController::class, 'toggle']);
 $router->get('/admin/reviews', [AdminReviewController::class, 'index']);
 $router->post('/admin/reviews/{id}/toggle', [AdminReviewController::class, 'toggle']);
+$router->get('/admin/posts', [AdminPostController::class, 'index']);
+$router->post('/admin/posts', [AdminPostController::class, 'store']);
+$router->post('/admin/posts/{id}/toggle', [AdminPostController::class, 'toggle']);
+$router->post('/admin/posts/{id}/delete', [AdminPostController::class, 'delete']);
 $router->get('/admin/messages', [AdminMessageController::class, 'index']);
 $router->post('/admin/messages/{id}/read', [AdminMessageController::class, 'markRead']);
 $router->get('/admin/masters', [AdminMasterController::class, 'index']);

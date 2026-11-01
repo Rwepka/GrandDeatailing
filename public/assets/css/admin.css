@@ -135,3 +135,8 @@
 .modal-changes { list-style: none; padding: 0; margin: 12px 0; max-height: 300px; overflow: auto; }
 .modal-changes li { padding: 6px 0; border-bottom: 1px solid #f1f5f9; }
 .modal-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 16px; }
+
+/* Новости */
+.post-item { border: 1px solid #3a4150; border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+.post-item-title { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.post-item-actions { display: flex; gap: 8px; margin-top: 8px; }

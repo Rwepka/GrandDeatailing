@@ -9,6 +9,11 @@ $current = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/';
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?= e($title) ?></title>
+    <link rel="icon" href="<?= e(url('/favicon.ico')) ?>">
+    <link rel="icon" type="image/png" sizes="32x32" href="<?= e(url('/favicon-32x32.png')) ?>">
+    <link rel="apple-touch-icon" href="<?= e(url('/apple-touch-icon.png')) ?>">
+    <link rel="manifest" href="<?= e(url('/site.webmanifest')) ?>">
+    <meta name="theme-color" content="#5e5c64">
     <link rel="stylesheet" href="<?= e(asset('css/style.css')) ?>">
     <link rel="stylesheet" href="<?= e(asset('css/admin.css')) ?>">
     <script src="<?= e(asset('js/admin.js')) ?>" defer></script>
@@ -29,6 +34,7 @@ $current = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/';
                 <a href="<?= e(url('/admin/clients')) ?>" class="<?= str_starts_with($current, '/admin/clients') ? 'active' : '' ?>">Клиенты</a>
                 <a href="<?= e(url('/admin/masters')) ?>" class="<?= str_starts_with($current, '/admin/masters') ? 'active' : '' ?>">Мастера</a>
                 <a href="<?= e(url('/admin/reviews')) ?>" class="<?= str_starts_with($current, '/admin/reviews') ? 'active' : '' ?>">Отзывы</a>
+                <a href="<?= e(url('/admin/posts')) ?>" class="<?= str_starts_with($current, '/admin/posts') ? 'active' : '' ?>">Новости</a>
                 <a href="<?= e(url('/admin/messages')) ?>" class="<?= str_starts_with($current, '/admin/messages') ? 'active' : '' ?>">Сообщения</a>
                 <a href="<?= e(url('/admin/settings')) ?>" class="<?= str_starts_with($current, '/admin/settings') ? 'active' : '' ?>">Настройки</a>
             <?php endif; ?>

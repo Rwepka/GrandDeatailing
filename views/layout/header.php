@@ -9,6 +9,11 @@ $current = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/';
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?= e($title) ?></title>
+    <link rel="icon" href="<?= e(url('/favicon.ico')) ?>">
+    <link rel="icon" type="image/png" sizes="32x32" href="<?= e(url('/favicon-32x32.png')) ?>">
+    <link rel="apple-touch-icon" href="<?= e(url('/apple-touch-icon.png')) ?>">
+    <link rel="manifest" href="<?= e(url('/site.webmanifest')) ?>">
+    <meta name="theme-color" content="#5e5c64">
     <link rel="stylesheet" href="<?= e(asset('css/style.css')) ?>">
 </head>
 <body>
@@ -23,6 +28,7 @@ $current = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/';
                 <?php else: ?>
                     <a href="<?= e(url('/')) ?>" class="<?= $current === '/' ? 'active' : '' ?>">Главная</a>
                     <a href="<?= e(url('/services')) ?>" class="<?= str_starts_with($current, '/services') ? 'active' : '' ?>">Услуги</a>
+                    <a href="<?= e(url('/news')) ?>" class="<?= str_starts_with($current, '/news') ? 'active' : '' ?>">Новости</a>
                     <a href="#">Портфолио</a>
                     <a href="<?= e(url('/reviews')) ?>" class="<?= str_starts_with($current, '/reviews') ? 'active' : '' ?>">Отзывы</a>
                     <a href="<?= e(url('/contacts')) ?>" class="<?= str_starts_with($current, '/contacts') ? 'active' : '' ?>">Контакты</a>
