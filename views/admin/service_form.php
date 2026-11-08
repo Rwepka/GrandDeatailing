@@ -11,6 +11,8 @@ $categories = $categories ?? [];
 $service = $service ?? null;
 $errors = $errors ?? [];
 $old = $old ?? [];
+$prices = $prices ?? [];
+$bodyTypes = car_classes();
 
 $isEdit = $service !== null;
 $selectedCategoryId = $old['category_id'] ?? $service['category_id'] ?? '';
@@ -42,13 +44,19 @@ $selectedCategoryId = $old['category_id'] ?? $service['category_id'] ?? '';
             <input type="text" name="slug" id="slug" placeholder="deteyling-kuzova" value="<?= e((string) ($old['slug'] ?? $service['slug'] ?? '')) ?>">
         </div>
 
-        <div class="field-group">
-            <label for="price_from">Цена, ₽ <small>(необязательно)</small></label>
-            <input type="number" name="price_from" id="price_from" step="0.01" min="0" placeholder="8000" value="<?= e((string) ($old['price_from'] ?? $service['price_from'] ?? '')) ?>">
-        </div>
+        <fieldset class="fieldset">
+            <legend>Цены</legend>
+            <?php foreach ($bodyTypes as $i => $bodyType): ?>
+                <div class="field-group">
+                    <label for="price-<?= (int) $i ?>"><?= e($bodyType) ?></label>
+                    <input type="number" name="prices[<?= e($bodyType) ?>]" id="price-<?= (int) $i ?>" step="0.01" min="0" placeholder="8000"
+                           value="<?= e((string) ($old['prices'][$bodyType] ?? $prices[$bodyType] ?? '')) ?>">
+                </div>
+            <?php endforeach; ?>
+        </fieldset>
 
         <div class="field-group">
-            <label for="duration_min">Длительность, мин <small>(необязательно)</small></label>
+            <label for="duration_min">Длительность, мин</label>
             <input type="number" name="duration_min" id="duration_min" step="1" min="0" placeholder="120" value="<?= e((string) ($old['duration_min'] ?? $service['duration_min'] ?? '')) ?>">
         </div>
 

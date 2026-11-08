@@ -140,3 +140,34 @@
 .post-item { border: 1px solid #3a4150; border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
 .post-item-title { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .post-item-actions { display: flex; gap: 8px; margin-top: 8px; }
+
+/* Блок «Цены» в форме услуги */
+.fieldset {
+    border: 1px solid #3a4150;
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 16px;
+}
+.fieldset legend {
+    color: var(--text);
+    font-weight: 600;
+    padding: 0 8px;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+.field-group input[type="number"],
+.field-group select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 16px;
+    font-family: inherit;
+    background: var(--bg);
+    color: var(--text);
+}
+
+/* Тёмный текст подписей и примечаний на металлик-карточках форм (service_form, master_form) */
+.admin-main .card .field-group label { color: var(--text); }
+.admin-main .card .field-group small { color: #4B5563; }

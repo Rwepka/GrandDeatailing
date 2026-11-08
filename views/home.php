@@ -1,5 +1,7 @@
 <?php
 /** @var array<int, array{slug: string, title: string, price: string}> $services */
+/** @var array<int, array<string, mixed>> $servicePrices */
+$servicePrices = $servicePrices ?? [];
 ?>
 <section class="hero">
     <div class="container">
@@ -42,7 +44,7 @@
                 <div class="calculator-services">
                     <?php foreach ($calculatorServices ?? [] as $s): ?>
                         <label class="calculator-service">
-                            <input type="checkbox" name="service_ids[]" value="<?= e((string)$s['id']) ?>" data-price="<?= e((string)($s['price_from'] ?? '')) ?>">
+                            <input type="checkbox" name="service_ids[]" value="<?= e((string)$s['id']) ?>" data-price="<?= e((string)($s['price_from'] ?? '')) ?>" data-prices="<?= e(json_encode($servicePrices[(int)$s['id']] ?? [], JSON_UNESCAPED_UNICODE)) ?>">
                             <span><?= e((string)$s['title']) ?></span>
                         </label>
                     <?php endforeach; ?>

@@ -177,6 +177,28 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Цена под выбранный класс автомобиля: сначала из data-prices, затем базовый data-price.
+    const priceForClass = (baseRaw, pricesJson, carClass) => {
+        if (pricesJson) {
+            try {
+                const map = JSON.parse(pricesJson);
+                const val = map && carClass ? map[carClass] : undefined;
+                if (val !== undefined && val !== null && val !== '') {
+                    const p = parseFloat(val);
+                    if (Number.isFinite(p)) return p;
+                }
+            } catch (e) { /* повреждённый JSON — игнорируем */ }
+        }
+        const raw = (baseRaw === undefined || baseRaw === null) ? '' : String(baseRaw).trim();
+        if (raw !== '' && raw !== '0') {
+            const p = parseFloat(raw);
+            if (Number.isFinite(p)) return p;
+        }
+        return null;
+    };
+
+    const formatRoubles = (value) => 'от ' + value.toLocaleString('ru-RU') + ' ₽';
+
     // Калькулятор стоимости на главной странице.
     const calcTotal = document.getElementById('calc-total');
     if (calcTotal) {
@@ -184,22 +206,54 @@ document.addEventListener('DOMContentLoaded', () => {
         const calcCarClasses = Array.from(document.querySelectorAll('input[name="car_class"]'));
 
         const recalc = () => {
+            const carClassRadio = document.querySelector('input[name="car_class"]:checked');
+            const carClass = carClassRadio ? carClassRadio.value : '';
+
             const sum = calcServices.reduce((acc, cb) => {
                 if (!cb.checked) return acc;
-                const raw = (cb.dataset.price || '').trim();
-                if (raw === '' || raw === '0') return acc;
-                const price = parseFloat(raw);
-                return Number.isFinite(price) ? acc + price : acc;
+                const price = priceForClass(cb.dataset.price, cb.dataset.prices, carClass);
+                return price === null ? acc : acc + price;
             }, 0);
 
-            calcTotal.textContent = sum === 0
-                ? 'от 0 ₽'
-                : 'от ' + sum.toLocaleString('ru-RU') + ' ₽';
+            calcTotal.textContent = sum === 0 ? 'от 0 ₽' : formatRoubles(sum);
         };
 
         calcServices.forEach((cb) => cb.addEventListener('change', recalc));
         calcCarClasses.forEach((radio) => radio.addEventListener('change', recalc));
         recalc();
+    }
+
+    // Цены по кузову и итог в шаге 2 квиза записи.
+    const bookingForm = document.getElementById('booking-form');
+    const quizTotal = document.getElementById('quiz-total');
+    if (bookingForm && quizTotal) {
+        const quizCards = Array.from(bookingForm.querySelectorAll('.service-card'));
+        const quizCarClasses = Array.from(bookingForm.querySelectorAll('input[name="car_class"]'));
+        const quizServices = Array.from(bookingForm.querySelectorAll('input[name="service_ids[]"]'));
+
+        const updateQuizPrices = () => {
+            const carClassRadio = bookingForm.querySelector('input[name="car_class"]:checked');
+            const carClass = carClassRadio ? carClassRadio.value : '';
+
+            let sum = 0;
+            quizCards.forEach((card) => {
+                const cb = card.querySelector('input[name="service_ids[]"]');
+                const priceEl = card.querySelector('.price');
+                const price = priceForClass(card.dataset.price, card.dataset.prices, carClass);
+                if (priceEl) {
+                    priceEl.textContent = price === null ? 'цена по запросу' : formatRoubles(price);
+                }
+                if (cb && cb.checked && price !== null) {
+                    sum += price;
+                }
+            });
+
+            quizTotal.textContent = sum === 0 ? 'от 0 ₽' : formatRoubles(sum);
+        };
+
+        quizCarClasses.forEach((radio) => radio.addEventListener('change', updateQuizPrices));
+        quizServices.forEach((cb) => cb.addEventListener('change', updateQuizPrices));
+        updateQuizPrices();
     }
 
     // Маска телефона: +7 (XXX) XXX-XX-XX для всех полей type="tel".

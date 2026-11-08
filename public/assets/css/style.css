@@ -336,6 +336,15 @@ a { color: var(--blue); text-decoration: none; }
     -webkit-text-fill-color: transparent;
     color: transparent;
 }
+.quiz-total { font-size: 18px; margin-top: 8px; }
+.quiz-total strong {
+    font-size: 24px;
+    background-image: linear-gradient(135deg, #5a626b 0%, #7e8891 15%, #eef2f5 50%, #7e8891 85%, #5a626b 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+}
 
 /* --- Хлебные крошки --- */
 .breadcrumbs { font-size: 14px; color: var(--text-muted, #6b7280); margin-bottom: 16px; }

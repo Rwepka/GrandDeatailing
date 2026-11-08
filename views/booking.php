@@ -12,6 +12,7 @@ $carClasses = $carClasses ?? [];
 $errors = $errors ?? [];
 $old = $old ?? [];
 $skipToStep3 = $skipToStep3 ?? false;
+$servicePrices = $servicePrices ?? [];
 
 $oldServiceIds = array_map('intval', (array) ($old['service_ids'] ?? []));
 $oldCarClass = (string) ($old['car_class'] ?? '');
@@ -76,13 +77,16 @@ $crumbs = [
                 <h2>Услуги</h2>
                 <div class="cards">
                     <?php foreach ($services as $service): ?>
-                        <label class="card service-card">
+                        <label class="card service-card"
+                               data-price="<?= e((string) ($service['price_from'] ?? '')) ?>"
+                               data-prices="<?= e(json_encode($servicePrices[(int) $service['id']] ?? [], JSON_UNESCAPED_UNICODE)) ?>">
                             <input type="checkbox" name="service_ids[]" value="<?= e((string) $service['id']) ?>" <?= in_array((int) $service['id'], $oldServiceIds, true) ? 'checked' : '' ?>>
                             <h3><?= e($service['title']) ?></h3>
                             <p class="price"><?= e(price($service['price_from'] === null ? null : (float) $service['price_from'])) ?></p>
                         </label>
                     <?php endforeach; ?>
                 </div>
+                <div class="quiz-total">Итого: <strong id="quiz-total">от 0 ₽</strong></div>
                 <div class="step-actions">
                     <button type="button" class="btn btn-outline" data-prev>Назад</button>
                     <button type="button" class="btn btn-accent" data-next>Далее</button>

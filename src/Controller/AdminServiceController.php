@@ -6,6 +6,7 @@ namespace App\Controller;
 use App\Core\View;
 use App\Model\Category;
 use App\Model\Service;
+use App\Model\ServicePrice;
 
 /**
  * CRUD услуг в админ-панели.
@@ -42,6 +43,7 @@ class AdminServiceController
             'service' => null,
             'errors' => [],
             'old' => [],
+            'prices' => [],
         ]);
     }
 
@@ -60,6 +62,7 @@ class AdminServiceController
                 'service' => null,
                 'errors' => ['Сессия устарела. Обновите страницу и попробуйте ещё раз.'],
                 'old' => $old,
+                'prices' => [],
             ]);
             return;
         }
@@ -73,11 +76,13 @@ class AdminServiceController
                 'service' => null,
                 'errors' => $result['errors'],
                 'old' => $old,
+                'prices' => [],
             ]);
             return;
         }
 
-        Service::create($result['data'] + ['is_active' => 1]);
+        $serviceId = Service::create($result['data'] + ['is_active' => 1]);
+        ServicePrice::save($serviceId, $result['prices']);
         redirect('/admin/services');
     }
 
@@ -96,6 +101,7 @@ class AdminServiceController
             'service' => $service,
             'errors' => [],
             'old' => $service,
+            'prices' => ServicePrice::forService($id),
         ]);
     }
 
@@ -119,6 +125,7 @@ class AdminServiceController
                 'service' => $service,
                 'errors' => ['Сессия устарела. Обновите страницу и попробуйте ещё раз.'],
                 'old' => $old,
+                'prices' => [],
             ]);
             return;
         }
@@ -132,11 +139,13 @@ class AdminServiceController
                 'service' => $service,
                 'errors' => $result['errors'],
                 'old' => $old,
+                'prices' => [],
             ]);
             return;
         }
 
         Service::update($id, $result['data']);
+        ServicePrice::save($id, $result['prices']);
         redirect('/admin/services');
     }
 
@@ -164,12 +173,17 @@ class AdminServiceController
      */
     private function postedOld(): array
     {
+        $prices = [];
+        foreach (car_classes() as $bodyType) {
+            $prices[$bodyType] = trim((string) ($_POST['prices'][$bodyType] ?? ''));
+        }
+
         return [
             'title' => trim((string) ($_POST['title'] ?? '')),
             'slug' => trim((string) ($_POST['slug'] ?? '')),
-            'price_from' => trim((string) ($_POST['price_from'] ?? '')),
             'duration_min' => trim((string) ($_POST['duration_min'] ?? '')),
             'category_id' => trim((string) ($_POST['category_id'] ?? '')),
+            'prices' => $prices,
         ];
     }
 
@@ -177,7 +191,7 @@ class AdminServiceController
      * Валидация формы услуги (общая для create/update).
      *
      * @param array<int, array<string, mixed>> $categories
-     * @return array{data: array<string, mixed>, errors: array<int, string>}
+     * @return array{data: array<string, mixed>, prices: array<string, float|null>, errors: array<int, string>}
      */
     private function validate(array $categories): array
     {
@@ -201,17 +215,6 @@ class AdminServiceController
             $errors[] = 'Slug не должен быть длиннее 160 символов.';
         } elseif (preg_match('/^[a-z0-9-]+$/', $slug) !== 1) {
             $errors[] = 'Slug может содержать только латиницу, цифры и дефис.';
-        }
-
-        // --- Цена (необязательно, число) ---
-        $priceRaw = trim((string) ($_POST['price_from'] ?? ''));
-        $priceFrom = null;
-        if ($priceRaw !== '') {
-            if (filter_var($priceRaw, FILTER_VALIDATE_FLOAT) === false) {
-                $errors[] = 'Цена должна быть числом.';
-            } else {
-                $priceFrom = (float) $priceRaw;
-            }
         }
 
         // --- Длительность (необязательно, целое число) ---
@@ -242,6 +245,29 @@ class AdminServiceController
             }
         }
 
+        // --- Цены по типам кузова (необязательно, число) ---
+        $prices = [];
+        foreach (car_classes() as $bodyType) {
+            $raw = trim((string) ($_POST['prices'][$bodyType] ?? ''));
+            if ($raw === '') {
+                $prices[$bodyType] = null;
+                continue;
+            }
+            if (filter_var($raw, FILTER_VALIDATE_FLOAT) === false) {
+                $errors[] = 'Цена «' . $bodyType . '» должна быть числом.';
+            } else {
+                $prices[$bodyType] = (float) $raw;
+            }
+        }
+
+        // --- «Цена от» = минимальная из цен по кузовам ---
+        $priceFrom = null;
+        foreach ($prices as $price) {
+            if ($price !== null && ($priceFrom === null || $price < $priceFrom)) {
+                $priceFrom = $price;
+            }
+        }
+
         return [
             'data' => [
                 'category_id' => $categoryId,
@@ -251,6 +277,7 @@ class AdminServiceController
                 'duration_min' => $durationMin,
                 'image' => null,
             ],
+            'prices' => $prices,
             'errors' => $errors,
         ];
     }

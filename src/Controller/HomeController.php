@@ -5,6 +5,7 @@ namespace App\Controller;
 
 use App\Core\View;
 use App\Model\Service;
+use App\Model\ServicePrice;
 
 class HomeController
 {
@@ -16,6 +17,7 @@ class HomeController
         }
 
         $activeServices = Service::active();
+        $servicePrices = ServicePrice::mapForServices(array_column($activeServices, 'id'));
 
         $services = array_map(
             static function (array $s): array {
@@ -33,6 +35,7 @@ class HomeController
             'services' => $services,
             'carClasses' => car_classes(),
             'calculatorServices' => $activeServices,
+            'servicePrices' => $servicePrices,
         ]);
     }
 }

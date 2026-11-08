@@ -9,6 +9,7 @@ use App\Model\Booking;
 use App\Model\BookingItem;
 use App\Model\RateLimit;
 use App\Model\Service;
+use App\Model\ServicePrice;
 
 class BookingController
 {
@@ -36,9 +37,13 @@ class BookingController
             : [];
         $skipToStep3 = $carClass !== '' || $serviceIds !== [];
 
+        $services = Service::active();
+        $servicePrices = ServicePrice::mapForServices(array_column($services, 'id'));
+
         View::render('booking', [
             'title' => 'Запись онлайн',
-            'services' => Service::active(),
+            'services' => $services,
+            'servicePrices' => $servicePrices,
             'carClasses' => self::CAR_CLASSES,
             'old' => [
                 'name' => $user['name'] ?? '',
@@ -215,6 +220,8 @@ class BookingController
             return;
         }
 
+        $pricesMap = ServicePrice::mapForServices(array_keys($serviceIds));
+
         $pdo = Database::connection();
         try {
             $pdo->beginTransaction();
@@ -231,7 +238,10 @@ class BookingController
 
             foreach ($serviceIds as $sid) {
                 $service = $activeById[$sid];
-                $rawPrice = $service['price_from'] ?? null;
+                $perBody = $pricesMap[$sid][$carClass] ?? null;
+                $rawPrice = ($perBody !== null && $perBody !== '')
+                    ? $perBody
+                    : ($service['price_from'] ?? null);
                 BookingItem::create([
                     'booking_id' => $bookingId,
                     'service_id' => $sid,

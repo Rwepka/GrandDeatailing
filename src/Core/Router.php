@@ -34,6 +34,13 @@ class Router
     public function dispatch(string $method, string $uri): void
     {
         $method = strtoupper($method);
+
+        // HEAD семантически равен GET (тот же набор заголовков, без тела ответа).
+        // Тело отбросит сам веб-сервер; здесь достаточно искать маршруты как для GET.
+        if ($method === 'HEAD') {
+            $method = 'GET';
+        }
+
         $uri = rtrim($uri, '/');
         if ($uri === '') {
             $uri = '/';
