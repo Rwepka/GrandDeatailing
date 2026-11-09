@@ -233,6 +233,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const formatRoubles = (value) => 'от ' + value.toLocaleString('ru-RU') + ' ₽';
 
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    // Анимация итоговой цены: плавный счётчик от текущего значения к новому.
+    const animatePrice = (el, to) => {
+        const from = Number(el.dataset.priceValue || 0) || 0;
+        const target = Math.max(0, Math.round(to));
+        el.dataset.priceValue = String(target);
+
+        if (reducedMotion || from === target) {
+            el.textContent = formatRoubles(target);
+            return;
+        }
+
+        const duration = 280;
+        const started = performance.now();
+        const tick = (now) => {
+            const t = Math.min(1, (now - started) / duration);
+            const eased = 1 - Math.pow(1 - t, 3);
+            el.textContent = formatRoubles(Math.round(from + (target - from) * eased));
+            if (t < 1) {
+                requestAnimationFrame(tick);
+            } else {
+                el.textContent = formatRoubles(target);
+            }
+        };
+        requestAnimationFrame(tick);
+    };
+
     // Калькулятор стоимости на главной странице.
     const calcTotal = document.getElementById('calc-total');
     if (calcTotal) {
@@ -249,7 +276,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return price === null ? acc : acc + price;
             }, 0);
 
-            calcTotal.textContent = sum === 0 ? 'от 0 ₽' : formatRoubles(sum);
+            animatePrice(calcTotal, sum);
         };
 
         calcServices.forEach((cb) => cb.addEventListener('change', recalc));
@@ -282,7 +309,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
-            quizTotal.textContent = sum === 0 ? 'от 0 ₽' : formatRoubles(sum);
+            animatePrice(quizTotal, sum);
         };
 
         quizCarClasses.forEach((radio) => radio.addEventListener('change', updateQuizPrices));
