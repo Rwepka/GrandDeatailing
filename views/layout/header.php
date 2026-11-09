@@ -58,21 +58,24 @@ $absoluteUrl = $baseUrl . ($current === '/' ? '/' : $current);
     <link rel="stylesheet" href="<?= e(asset('css/style.css')) ?>">
 </head>
 <body>
+<a class="skip-link" href="#main">Перейти к содержимому</a>
 <header class="site-header">
     <div class="container header-inner">
         <a href="<?= e(url('/')) ?>" class="logo">GRAND <span>DETAILING</span></a>
-        <button class="nav-toggle" id="nav-toggle" aria-label="Открыть меню">☰</button>
+        <button type="button" class="nav-toggle" id="nav-toggle" aria-label="Открыть меню" aria-expanded="false" aria-controls="header-menu">
+            <span class="nav-toggle-bars" aria-hidden="true"><span></span><span></span><span></span></span>
+        </button>
         <div class="header-menu" id="header-menu">
-            <nav class="main-nav">
+            <div class="header-menu-inner">
+            <nav class="main-nav" aria-label="Основное меню">
                 <?php if (isMaster()): ?>
-                    <a href="<?= e(url('/contacts')) ?>" class="<?= str_starts_with($current, '/contacts') ? 'active' : '' ?>">Контакты</a>
+                    <a href="<?= e(url('/contacts')) ?>"<?= nav_attrs(str_starts_with($current, '/contacts')) ?>>Контакты</a>
                 <?php else: ?>
-                    <a href="<?= e(url('/')) ?>" class="<?= $current === '/' ? 'active' : '' ?>">Главная</a>
-                    <a href="<?= e(url('/services')) ?>" class="<?= str_starts_with($current, '/services') ? 'active' : '' ?>">Услуги</a>
-                    <a href="<?= e(url('/news')) ?>" class="<?= str_starts_with($current, '/news') ? 'active' : '' ?>">Новости</a>
-                    <a href="#">Портфолио</a>
-                    <a href="<?= e(url('/reviews')) ?>" class="<?= str_starts_with($current, '/reviews') ? 'active' : '' ?>">Отзывы</a>
-                    <a href="<?= e(url('/contacts')) ?>" class="<?= str_starts_with($current, '/contacts') ? 'active' : '' ?>">Контакты</a>
+                    <a href="<?= e(url('/')) ?>"<?= nav_attrs($current === '/') ?>>Главная</a>
+                    <a href="<?= e(url('/services')) ?>"<?= nav_attrs(str_starts_with($current, '/services')) ?>>Услуги</a>
+                    <a href="<?= e(url('/news')) ?>"<?= nav_attrs(str_starts_with($current, '/news')) ?>>Новости</a>
+                    <a href="<?= e(url('/reviews')) ?>"<?= nav_attrs(str_starts_with($current, '/reviews')) ?>>Отзывы</a>
+                    <a href="<?= e(url('/contacts')) ?>"<?= nav_attrs(str_starts_with($current, '/contacts')) ?>>Контакты</a>
                 <?php endif; ?>
             </nav>
             <div class="header-actions">
@@ -92,7 +95,8 @@ $absoluteUrl = $baseUrl . ($current === '/' ? '/' : $current);
                 <?php endif; ?>
                 <a href="<?= e(url('/booking')) ?>" class="btn btn-accent">Записаться</a>
             </div>
+            </div>
         </div>
     </div>
 </header>
-<main class="site-main">
+<main class="site-main" id="main" tabindex="-1">

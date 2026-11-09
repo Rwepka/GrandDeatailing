@@ -5,6 +5,7 @@ namespace App\Controller;
 
 use App\Core\Database;
 use App\Core\View;
+use App\Model\AuditLog;
 use App\Model\Booking;
 use App\Model\BookingItem;
 use App\Model\Service;
@@ -72,11 +73,89 @@ class AdminController
     {
         requireStaff();
 
+        $masterRoleId = (int) (Database::connection()->query("SELECT id FROM roles WHERE code = 'master'")->fetchColumn() ?: 3);
+
         View::renderAdmin('bookings', [
             'title' => 'Заявки',
             'bookings' => Booking::latestWithCost(),
+            'masters' => User::findByRole($masterRoleId),
             'flash' => flash(),
         ]);
+    }
+
+    /**
+     * Взять заявку на себя (админ или мастер).
+     */
+    public function takeBooking(int $id): void
+    {
+        requireStaff();
+
+        if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
+            redirect('/admin/bookings');
+        }
+
+        if (!csrf_verify($_POST['csrf_token'] ?? null)) {
+            http_response_code(419);
+            redirect('/admin/bookings');
+        }
+
+        $booking = Booking::find($id);
+        if ($booking === null) {
+            redirect('/admin/bookings');
+        }
+
+        if (!empty($booking['master_id'])) {
+            setFlash('Заявка уже закреплена за мастером.');
+            redirect('/admin/bookings');
+        }
+
+        $user = auth();
+        Booking::setMaster($id, (int) $user['id']);
+        AuditLog::record('booking.take', 'booking', $id, 'user_id=' . (int) $user['id']);
+        setFlash('Заявка взята вами.');
+        redirect('/admin/bookings');
+    }
+
+    /**
+     * Назначить заявку мастеру (только администратор).
+     */
+    public function assignMaster(int $id): void
+    {
+        requireAdmin();
+
+        if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
+            redirect('/admin/bookings');
+        }
+
+        if (!csrf_verify($_POST['csrf_token'] ?? null)) {
+            http_response_code(419);
+            redirect('/admin/bookings');
+        }
+
+        $booking = Booking::find($id);
+        if ($booking === null) {
+            redirect('/admin/bookings');
+        }
+
+        $masterId = (int) ($_POST['master_id'] ?? 0);
+        if ($masterId === 0) {
+            Booking::setMaster($id, null);
+            AuditLog::record('booking.unassign', 'booking', $id);
+            setFlash('Назначение мастера снято.');
+            redirect('/admin/bookings');
+        }
+
+        $masterRoleId = (int) (Database::connection()->query("SELECT id FROM roles WHERE code = 'master'")->fetchColumn() ?: 3);
+        $master = User::find($masterId);
+        if ($master === null || (int) $master['role_id'] !== $masterRoleId) {
+            setFlash('Некорректный мастер.');
+            redirect('/admin/bookings');
+        }
+
+        Booking::setMaster($id, $masterId);
+        AuditLog::record('booking.assign', 'booking', $id, 'master_id=' . $masterId);
+        setFlash('Заявка назначена мастеру «' . $master['name'] . '».');
+        redirect('/admin/bookings');
     }
 
     public function createBooking(): void
@@ -284,9 +363,10 @@ class AdminController
             redirect('/admin/bookings');
         }
 
+        $cost = null;
         if ($status === 'in_work') {
             $cost = (float) str_replace(',', '.', (string) ($_POST['cost'] ?? ''));
-            if ($cost <= 0) {
+            if (!is_finite($cost) || $cost <= 0 || $cost > 100000000) {
                 setFlash('Введите корректную согласованную стоимость.');
                 redirect('/admin/bookings');
             }
@@ -295,14 +375,22 @@ class AdminController
 
         if ($status === 'done') {
             $cost = (float) str_replace(',', '.', (string) ($_POST['cost'] ?? ''));
-            if ($cost <= 0) {
+            if (!is_finite($cost) || $cost <= 0 || $cost > 100000000) {
                 setFlash('Введите корректную итоговую стоимость.');
                 redirect('/admin/bookings');
             }
             Booking::setFinalCost($id, $cost);
         }
 
+        $before = Booking::find($id);
+        $oldStatus = $before !== null ? (string) ($before['status'] ?? '') : '';
         Booking::updateStatus($id, $status);
+
+        $meta = $oldStatus !== '' ? ($oldStatus . ' → ' . $status) : ('status=' . $status);
+        if ($cost !== null) {
+            $meta .= ', cost=' . $cost;
+        }
+        AuditLog::record('booking.status', 'booking', $id, $meta);
 
         redirect('/admin/bookings');
     }
@@ -341,16 +429,21 @@ class AdminController
             redirect('/admin/bookings');
         }
 
-        // Если пользователь с таким телефоном уже существует — привязываем заявку к нему.
+        // Аккаунт с этим телефоном уже есть: НЕ привязываем автоматически (AUTH-01).
+        // Администратор должен явно подтвердить, что это тот же клиент.
         $existing = User::findByPhone($phone);
         if ($existing !== null) {
-            Booking::linkUser($id, (int) $existing['id']);
-            setFlash('Заявка привязана к существующему клиенту «' . $existing['name'] . '».');
-            redirect('/admin/bookings');
+            View::renderAdmin('link_confirm', [
+                'title' => 'Подтверждение привязки',
+                'booking' => $booking,
+                'account' => $existing,
+                'phone' => $phone,
+            ]);
+            return;
         }
 
-        // Иначе создаём нового клиента с временным паролем.
-        $password = substr(bin2hex(random_bytes(6)), 0, 10);
+        // Иначе создаём нового клиента с временным паролем (128 бит).
+        $password = bin2hex(random_bytes(16));
 
         $clientRoleId = (int) (Database::connection()->query("SELECT id FROM roles WHERE code = 'client'")->fetchColumn() ?: 1);
 
@@ -360,11 +453,48 @@ class AdminController
             'email' => null,
             'phone' => $phone,
             'password_hash' => password_hash($password, PASSWORD_DEFAULT),
+            'must_change_password' => 1,
         ]);
 
         Booking::linkUser($id, $userId);
+        AuditLog::record('client.create', 'client', $userId, 'booking=' . $id);
 
         setFlash('Клиент создан: ' . $phone . '. Временный пароль: ' . $password . ' (сообщите клиенту).');
+        redirect('/admin/bookings');
+    }
+
+    /**
+     * Явное подтверждение привязки заявки к существующему аккаунту (AUTH-01).
+     */
+    public function confirmLink(int $id): void
+    {
+        requireAdmin();
+
+        if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
+            redirect('/admin/bookings');
+        }
+
+        if (!csrf_verify($_POST['csrf_token'] ?? null)) {
+            http_response_code(419);
+            redirect('/admin/bookings');
+        }
+
+        $booking = Booking::find($id);
+        if ($booking === null || !empty($booking['user_id'])) {
+            redirect('/admin/bookings');
+        }
+
+        $phone = normalize_phone((string) ($booking['client_phone'] ?? ''));
+        $account = $phone === '' ? null : User::findByPhone($phone);
+
+        if ($account === null) {
+            setFlash('Аккаунт с этим телефоном не найден. Привязка отменена.');
+            redirect('/admin/bookings');
+        }
+
+        Booking::linkUser($id, (int) $account['id']);
+        AuditLog::record('booking.link', 'booking', $id, 'user_id=' . (int) $account['id']);
+        setFlash('Заявка привязана к аккаунту «' . $account['name'] . '».');
         redirect('/admin/bookings');
     }
 
@@ -385,6 +515,7 @@ class AdminController
         }
 
         Booking::delete($id);
+        AuditLog::record('booking.delete', 'booking', $id);
         setFlash('Заявка удалена.');
         redirect('/admin/bookings');
     }

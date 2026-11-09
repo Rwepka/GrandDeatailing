@@ -21,6 +21,7 @@ $crumbs = [
         <div class="cabinet-layout">
             <?php $active = 'security'; require BASE_PATH . '/views/cabinet/_sidebar.php'; ?>
             <div class="cabinet-content">
+        <h1>Безопасность</h1>
         <?php if (!empty($flash)): ?>
             <div class="flash" role="status"><?= e((string) $flash) ?></div>
         <?php endif; ?>
@@ -42,7 +43,8 @@ $crumbs = [
                 <?= csrf_field() ?>
                 <div class="field-group">
                     <label for="phone">Телефон</label>
-                    <input type="tel" name="phone" id="phone" value="<?= e((string) ($old['phone'] ?? $user['phone'] ?? '')) ?>" placeholder="+7 900 000-00-00">
+                    <input type="tel" name="phone" id="phone" value="<?= e((string) ($old['phone'] ?? $user['phone'] ?? '')) ?>" placeholder="+7 900 000-00-00"<?= field_aria($errors, 'phone', 'err-phone') ?>>
+                    <?php if ($err = field_error($errors, 'phone')): ?><p class="field-error" id="err-phone"><?= e($err) ?></p><?php endif; ?>
                 </div>
                 <button type="submit" class="btn btn-accent">Сохранить</button>
             </form>
@@ -54,7 +56,8 @@ $crumbs = [
                 <?= csrf_field() ?>
                 <div class="field-group">
                     <label for="email">Email <small>(оставьте пустым, чтобы убрать)</small></label>
-                    <input type="email" name="email" id="email" value="<?= e((string) ($old['email'] ?? $user['email'] ?? '')) ?>" placeholder="you@example.com">
+                    <input type="email" name="email" id="email" value="<?= e((string) ($old['email'] ?? $user['email'] ?? '')) ?>" placeholder="you@example.com"<?= field_aria($errors, 'email', 'err-email') ?>>
+                    <?php if ($err = field_error($errors, 'email')): ?><p class="field-error" id="err-email"><?= e($err) ?></p><?php endif; ?>
                 </div>
                 <button type="submit" class="btn btn-accent">Сохранить</button>
             </form>
@@ -66,15 +69,18 @@ $crumbs = [
                 <?= csrf_field() ?>
                 <div class="field-group">
                     <label for="current_password">Текущий пароль</label>
-                    <input type="password" name="current_password" id="current_password">
+                    <input type="password" name="current_password" id="current_password" autocomplete="current-password"<?= field_aria($errors, 'current_password', 'err-current_password') ?>>
+                    <?php if ($err = field_error($errors, 'current_password')): ?><p class="field-error" id="err-current_password"><?= e($err) ?></p><?php endif; ?>
                 </div>
                 <div class="field-group">
                     <label for="password">Новый пароль <small>(минимум 8 символов)</small></label>
-                    <input type="password" name="password" id="password">
+                    <input type="password" name="password" id="password" autocomplete="new-password"<?= field_aria($errors, 'password', 'err-password') ?>>
+                    <?php if ($err = field_error($errors, 'password')): ?><p class="field-error" id="err-password"><?= e($err) ?></p><?php endif; ?>
                 </div>
                 <div class="field-group">
                     <label for="password_confirmation">Повторите новый пароль</label>
-                    <input type="password" name="password_confirmation" id="password_confirmation">
+                    <input type="password" name="password_confirmation" id="password_confirmation" autocomplete="new-password"<?= field_aria($errors, 'password_confirmation', 'err-password_confirmation') ?>>
+                    <?php if ($err = field_error($errors, 'password_confirmation')): ?><p class="field-error" id="err-password_confirmation"><?= e($err) ?></p><?php endif; ?>
                 </div>
                 <button type="submit" class="btn btn-accent">Сохранить</button>
             </form>

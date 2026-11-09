@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Core\View;
+use App\Model\AuditLog;
 use App\Model\Category;
 use App\Model\Service;
 use App\Model\ServicePrice;
@@ -83,6 +84,7 @@ class AdminServiceController
 
         $serviceId = Service::create($result['data'] + ['is_active' => 1]);
         ServicePrice::save($serviceId, $result['prices']);
+        AuditLog::record('service.create', 'service', $serviceId, (string) $result['data']['title']);
         redirect('/admin/services');
     }
 
@@ -146,6 +148,7 @@ class AdminServiceController
 
         Service::update($id, $result['data']);
         ServicePrice::save($id, $result['prices']);
+        AuditLog::record('service.update', 'service', $id, (string) $result['data']['title']);
         redirect('/admin/services');
     }
 
@@ -160,7 +163,9 @@ class AdminServiceController
 
         $service = Service::find($id);
         if ($service !== null) {
-            Service::setActive($id, (int) $service['is_active'] ? false : true);
+            $active = (int) $service['is_active'] ? false : true;
+            Service::setActive($id, $active);
+            AuditLog::record('service.toggle', 'service', $id, $active ? 'on' : 'off');
         }
 
         redirect('/admin/services');
@@ -223,6 +228,8 @@ class AdminServiceController
         if ($durationRaw !== '') {
             if (filter_var($durationRaw, FILTER_VALIDATE_INT) === false) {
                 $errors[] = 'Длительность должна быть целым числом.';
+            } elseif ((int) $durationRaw < 0) {
+                $errors[] = 'Длительность не может быть отрицательной.';
             } else {
                 $durationMin = (int) $durationRaw;
             }
@@ -255,6 +262,8 @@ class AdminServiceController
             }
             if (filter_var($raw, FILTER_VALIDATE_FLOAT) === false) {
                 $errors[] = 'Цена «' . $bodyType . '» должна быть числом.';
+            } elseif ((float) $raw < 0) {
+                $errors[] = 'Цена «' . $bodyType . '» не может быть отрицательной.';
             } else {
                 $prices[$bodyType] = (float) $raw;
             }

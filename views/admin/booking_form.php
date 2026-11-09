@@ -60,11 +60,13 @@ $old = $old ?? [];
             <label>Услуги</label>
             <div class="cards">
                 <?php foreach ($services as $service): ?>
-                    <label class="card service-card">
-                        <input type="checkbox" name="service_ids[]" value="<?= e((string) $service['id']) ?>" <?= in_array((int) $service['id'], $old['service_ids'] ?? [], true) ? 'checked' : '' ?>>
-                        <h3><?= e($service['title']) ?></h3>
-                        <p class="price"><?= e(price($service['price_from'] === null ? null : (float) $service['price_from'])) ?></p>
-                    </label>
+                    <div class="card service-card">
+                        <label class="service-card-label">
+                            <input type="checkbox" name="service_ids[]" value="<?= e((string) $service['id']) ?>" <?= in_array((int) $service['id'], $old['service_ids'] ?? [], true) ? 'checked' : '' ?>>
+                            <span class="service-card-title"><?= e($service['title']) ?></span>
+                            <span class="price"><?= e(price($service['price_from'] === null ? null : (float) $service['price_from'])) ?></span>
+                        </label>
+                    </div>
                 <?php endforeach; ?>
             </div>
         </div>

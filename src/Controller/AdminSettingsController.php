@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Core\View;
+use App\Model\AuditLog;
 use App\Model\Setting;
 
 /**
@@ -57,6 +58,8 @@ class AdminSettingsController
         foreach (array_keys(self::SETTINGS) as $key) {
             Setting::set($key, trim((string) ($_POST[$key] ?? '')));
         }
+
+        AuditLog::record('settings.update', 'settings', null, 'keys=' . implode(',', array_keys(self::SETTINGS)));
 
         setFlash('Настройки сохранены.');
         redirect('/admin/settings');

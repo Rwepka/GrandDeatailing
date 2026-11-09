@@ -99,11 +99,22 @@ class Booking extends Model
     {
         $stmt = Database::connection()->query(
             'SELECT b.*,
+                    u.name AS master_name,
                     (SELECT SUM(bi.price) FROM booking_items bi WHERE bi.booking_id = b.id) AS estimated_cost
              FROM bookings b
+             LEFT JOIN users u ON u.id = b.master_id
              ORDER BY b.created_at DESC, b.id DESC'
         );
         return $stmt->fetchAll();
+    }
+
+    /**
+     * Назначить ответственного мастера (NULL — снять назначение).
+     */
+    public static function setMaster(int $id, ?int $masterId): void
+    {
+        $stmt = Database::connection()->prepare('UPDATE bookings SET master_id = ? WHERE id = ?');
+        $stmt->execute([$masterId, $id]);
     }
 
     /**

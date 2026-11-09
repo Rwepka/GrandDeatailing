@@ -61,13 +61,13 @@ $statusLabels = [
     <button type="button" class="btn btn-outline btn-sm" data-range="week">Неделя</button>
     <button type="button" class="btn btn-outline btn-sm" data-range="month">Месяц</button>
     <button type="button" class="btn btn-outline btn-sm" data-range="year">Год</button>
-    <input type="date" id="income-from">
-    <input type="date" id="income-to">
+    <input type="date" id="income-from" aria-label="Дата начала периода">
+    <input type="date" id="income-to" aria-label="Дата окончания периода">
     <button type="button" class="btn btn-outline btn-sm" data-range="custom">Показать</button>
 </div>
 
 <canvas id="income-chart" height="100"></canvas>
-<div class="income-total">Итого за выбранный период: <strong id="income-total-value">0 ₽</strong></div>
+<div class="income-total" role="status" aria-live="polite">Итого за выбранный период: <strong id="income-total-value">0 ₽</strong></div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
@@ -196,13 +196,14 @@ $statusLabels = [
 <?php else: ?>
     <div class="table-responsive">
     <table class="admin-table">
+        <caption class="visually-hidden">Последние заявки</caption>
         <thead>
             <tr>
-                <th>№</th>
-                <th>Клиент</th>
-                <th>Автомобиль</th>
-                <th>Статус</th>
-                <th>Дата</th>
+                <th scope="col">№</th>
+                <th scope="col">Клиент</th>
+                <th scope="col">Автомобиль</th>
+                <th scope="col">Статус</th>
+                <th scope="col">Дата</th>
             </tr>
         </thead>
         <tbody>

@@ -5,9 +5,8 @@ namespace App\Controller;
 
 use App\Core\Database;
 use App\Core\View;
+use App\Model\AuditLog;
 use App\Model\User;
-use App\Model\Car;
-use App\Model\Booking;
 
 class AdminClientController
 {
@@ -18,16 +17,44 @@ class AdminClientController
     {
         requireAdmin();
 
-        $roleId = (int) (Database::connection()->query("SELECT id FROM roles WHERE code = 'client'")->fetchColumn() ?: 1);
-        $clients = User::findByRole($roleId);
-
-        foreach ($clients as &$client) {
-            $client['cars_count'] = count(Car::findByUser((int) $client['id']));
-            $client['bookings_count'] = count(Booking::findByUser((int) $client['id']));
+        // Автоудаление неподтверждённых клиентов старше 30 дней.
+        $removed = User::deleteUnverifiedOlderThan(30);
+        if ($removed > 0) {
+            setFlash('Удалено неподтверждённых клиентов (старше 30 дней): ' . $removed . '.');
         }
-        unset($client);
 
-        View::renderAdmin('clients', ['title' => 'Клиенты', 'clients' => $clients]);
+        $roleId = (int) (Database::connection()->query("SELECT id FROM roles WHERE code = 'client'")->fetchColumn() ?: 1);
+        $clients = User::findByRoleWithCounts($roleId);
+
+        View::renderAdmin('clients', [
+            'title' => 'Клиенты',
+            'clients' => $clients,
+            'flash' => flash(),
+        ]);
+    }
+
+    /**
+     * Отметить клиента как подтверждённого администратором.
+     */
+    public function verify(int $id): void
+    {
+        requireAdmin();
+
+        if (!csrf_verify($_POST['csrf_token'] ?? null)) {
+            http_response_code(419);
+            redirect('/admin/clients');
+        }
+
+        $clientRoleId = (int) (Database::connection()->query("SELECT id FROM roles WHERE code = 'client'")->fetchColumn() ?: 1);
+        $user = User::find($id);
+
+        if ($user !== null && (int) $user['role_id'] === $clientRoleId) {
+            User::setVerified($id);
+            AuditLog::record('client.verify', 'client', $id);
+            setFlash('Клиент подтверждён.');
+        }
+
+        redirect('/admin/clients');
     }
 
     /**
@@ -47,6 +74,7 @@ class AdminClientController
 
         if ($user !== null && (int) $user['role_id'] === $clientRoleId) {
             User::delete($id);
+            AuditLog::record('client.delete', 'client', $id);
             setFlash('Клиент удалён.');
         }
 

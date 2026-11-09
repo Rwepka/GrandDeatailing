@@ -24,6 +24,20 @@ function config(string $key, mixed $default = null): mixed
 }
 
 /**
+ * Запрос идёт по HTTPS (с учётом reverse-proxy и app.force_https).
+ */
+function is_https(): bool
+{
+    if (!empty($_SERVER['HTTPS']) && strtolower((string) $_SERVER['HTTPS']) !== 'off') {
+        return true;
+    }
+    if (strtolower((string) ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '')) === 'https') {
+        return true;
+    }
+    return (bool) config('app.force_https', false);
+}
+
+/**
  * Экранирование строки для вывода в HTML (защита от XSS).
  */
 function e(mixed $value): string
@@ -64,7 +78,43 @@ function redirect(string $path): never
  */
 function asset(string $path): string
 {
-    return url('assets/' . ltrim($path, '/'));
+    $clean = 'assets/' . ltrim($path, '/');
+    $result = url($clean);
+
+    // Версия по mtime — позволяет кэшировать статику надолго и сбрасывать кэш при изменении файла.
+    $full = BASE_PATH . '/public/' . $clean;
+    if (is_file($full)) {
+        $result .= '?v=' . filemtime($full);
+    }
+
+    return $result;
+}
+
+/**
+ * Атрибуты активного пункта навигации: class="active" + aria-current="page".
+ */
+function nav_attrs(bool $isActive): string
+{
+    return $isActive ? ' class="active" aria-current="page"' : '';
+}
+
+/**
+ * Атрибуты поля с ошибкой: aria-invalid + aria-describedby.
+ */
+function field_aria(array $errors, string $field, string $errorId): string
+{
+    if (!isset($errors[$field])) {
+        return '';
+    }
+    return ' aria-invalid="true" aria-describedby="' . e($errorId) . '"';
+}
+
+/**
+ * Текст ошибки конкретного поля (или null).
+ */
+function field_error(array $errors, string $field): ?string
+{
+    return isset($errors[$field]) ? (string) $errors[$field] : null;
 }
 
 /**
@@ -143,8 +193,17 @@ function logout(): void
  */
 function requireAuth(): void
 {
-    if (!isAuth()) {
+    $user = auth();
+    if ($user === null) {
         redirect('/login');
+    }
+
+    // Принудительная смена пароля при первом входе: не пускаем дальше формы смены.
+    if (!empty($user['must_change_password'])) {
+        $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
+        if ($path !== '/cabinet/security/password-change') {
+            redirect('/cabinet/security/password-change');
+        }
     }
 }
 
@@ -205,7 +264,7 @@ function rememberUser(int $userId): void
         'path' => '/',
         'httponly' => true,
         'samesite' => 'Strict',
-        'secure' => !empty($_SERVER['HTTPS']),
+        'secure' => is_https(),
     ]);
 }
 
@@ -223,7 +282,7 @@ function forgetRememberUser(): void
         'path' => '/',
         'httponly' => true,
         'samesite' => 'Strict',
-        'secure' => !empty($_SERVER['HTTPS']),
+        'secure' => is_https(),
     ]);
 }
 

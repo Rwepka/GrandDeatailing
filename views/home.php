@@ -4,6 +4,20 @@
 $servicePrices = $servicePrices ?? [];
 ?>
 <section class="hero">
+    <picture>
+        <source
+            type="image/webp"
+            srcset="<?= e(asset('img/hero-768.webp')) ?> 768w, <?= e(asset('img/hero-1280.webp')) ?> 1280w, <?= e(asset('img/hero-1920.webp')) ?> 1920w"
+            sizes="100vw">
+        <img class="hero-bg"
+             src="<?= e(asset('img/hero-1280.jpg')) ?>"
+             srcset="<?= e(asset('img/hero-768.jpg')) ?> 768w, <?= e(asset('img/hero-1280.jpg')) ?> 1280w, <?= e(asset('img/hero-1920.jpg')) ?> 1920w"
+             sizes="100vw"
+             alt=""
+             width="2560" height="1920"
+             fetchpriority="high"
+             decoding="async">
+    </picture>
     <div class="container">
         <h1>Детейлинг премиум-класса</h1>
         <p class="hero-sub">Мойка, полировка, защитные покрытия и химчистка салона — вернём автомобилю заводской вид.</p>
@@ -22,7 +36,7 @@ $servicePrices = $servicePrices ?? [];
                 </div>
             <?php endforeach; ?>
         </div>
-        <p style="margin-top: 16px"><a href="<?= e(url('/services')) ?>">Все услуги →</a></p>
+        <p style="margin-top: 16px"><a href="<?= e(url('/services')) ?>" class="link-light">Все услуги →</a></p>
     </div>
 </section>
 

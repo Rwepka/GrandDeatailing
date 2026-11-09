@@ -19,6 +19,7 @@ $crumbs = [
         <div class="cabinet-layout">
             <?php $active = 'cars'; require BASE_PATH . '/views/cabinet/_sidebar.php'; ?>
             <div class="cabinet-content">
+        <h1>Мои автомобили</h1>
         <?php if (!empty($errors)): ?>
             <div class="form-errors" role="alert">
                 <ul>
@@ -49,15 +50,18 @@ $crumbs = [
             <?= csrf_field() ?>
             <div class="field-group">
                 <label for="brand">Марка</label>
-                <input type="text" name="brand" id="brand" value="<?= e((string) ($old['brand'] ?? '')) ?>" required>
+                <input type="text" name="brand" id="brand" value="<?= e((string) ($old['brand'] ?? '')) ?>" required<?= field_aria($errors, 'brand', 'err-brand') ?>>
+                <?php if ($err = field_error($errors, 'brand')): ?><p class="field-error" id="err-brand"><?= e($err) ?></p><?php endif; ?>
             </div>
             <div class="field-group">
                 <label for="model">Модель</label>
-                <input type="text" name="model" id="model" value="<?= e((string) ($old['model'] ?? '')) ?>" required>
+                <input type="text" name="model" id="model" value="<?= e((string) ($old['model'] ?? '')) ?>" required<?= field_aria($errors, 'model', 'err-model') ?>>
+                <?php if ($err = field_error($errors, 'model')): ?><p class="field-error" id="err-model"><?= e($err) ?></p><?php endif; ?>
             </div>
             <div class="field-group">
                 <label for="year">Год выпуска <small>(необязательно)</small></label>
-                <input type="text" name="year" id="year" value="<?= e((string) ($old['year'] ?? '')) ?>" placeholder="Например: 2020">
+                <input type="text" name="year" id="year" value="<?= e((string) ($old['year'] ?? '')) ?>" placeholder="Например: 2020"<?= field_aria($errors, 'year', 'err-year') ?>>
+                <?php if ($err = field_error($errors, 'year')): ?><p class="field-error" id="err-year"><?= e($err) ?></p><?php endif; ?>
             </div>
             <div class="field-group">
                 <label for="vin">VIN <small>(необязательно)</small></label>

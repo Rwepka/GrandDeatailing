@@ -5,14 +5,34 @@ document.addEventListener('DOMContentLoaded', () => {
     const adminSidebar = document.getElementById('admin-sidebar');
     const adminOverlay = document.getElementById('admin-overlay');
     if (adminToggle && adminSidebar) {
+        const isDesktop = () => window.matchMedia('(min-width: 821px)').matches;
+        let overlayHideTimer = null;
         const closeMenu = () => {
-            adminSidebar.classList.remove('open');
-            if (adminOverlay) adminOverlay.hidden = true;
+            if (isDesktop()) {
+                return;
+            }
+            adminSidebar.classList.remove('expanded');
+            if (adminOverlay) {
+                // Overlay гаснет вместе с sidebar, а hidden ставим после анимации.
+                adminOverlay.classList.add('closing');
+                window.clearTimeout(overlayHideTimer);
+                overlayHideTimer = window.setTimeout(() => {
+                    adminOverlay.hidden = true;
+                    adminOverlay.classList.remove('closing');
+                }, 200);
+            }
+            adminToggle.setAttribute('aria-expanded', 'false');
+            adminToggle.setAttribute('aria-label', 'Развернуть меню');
         };
         adminToggle.addEventListener('click', () => {
-            const open = !adminSidebar.classList.contains('open');
-            adminSidebar.classList.toggle('open', open);
-            if (adminOverlay) adminOverlay.hidden = !open;
+            const expanded = adminSidebar.classList.toggle('expanded');
+            adminToggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+            adminToggle.setAttribute('aria-label', expanded ? 'Свернуть меню' : 'Развернуть меню');
+            if (!isDesktop() && adminOverlay) {
+                window.clearTimeout(overlayHideTimer);
+                adminOverlay.classList.remove('closing');
+                adminOverlay.hidden = !expanded;
+            }
         });
         if (adminOverlay) adminOverlay.addEventListener('click', closeMenu);
         adminSidebar.querySelectorAll('a').forEach((a) => a.addEventListener('click', closeMenu));
@@ -58,7 +78,22 @@ document.addEventListener('DOMContentLoaded', () => {
         const changesList = document.getElementById('settings-changes');
         const cancelBtn = document.getElementById('settings-cancel');
         const confirmBtn = document.getElementById('settings-confirm');
+        const dialog = settingsModal.querySelector('.modal');
         let allowSubmit = false;
+        let lastFocused = null;
+        let modalHideTimer = null;
+
+        const closeModal = () => {
+            settingsModal.classList.add('closing');
+            window.clearTimeout(modalHideTimer);
+            modalHideTimer = window.setTimeout(() => {
+                settingsModal.hidden = true;
+                settingsModal.classList.remove('closing');
+            }, 120);
+            if (lastFocused && typeof lastFocused.focus === 'function') {
+                lastFocused.focus();
+            }
+        };
 
         settingsForm.addEventListener('submit', (e) => {
             if (allowSubmit) return;
@@ -86,14 +121,124 @@ document.addEventListener('DOMContentLoaded', () => {
                 li.textContent = c.label + ': ' + (c.old || '—') + ' → ' + (c.neu || '—');
                 changesList.appendChild(li);
             });
+
+            lastFocused = document.activeElement;
+            window.clearTimeout(modalHideTimer);
+            settingsModal.classList.remove('closing');
             settingsModal.hidden = false;
+            if (dialog) {
+                dialog.setAttribute('tabindex', '-1');
+                dialog.focus();
+            }
         });
 
-        cancelBtn.addEventListener('click', () => { settingsModal.hidden = true; });
+        cancelBtn.addEventListener('click', closeModal);
         confirmBtn.addEventListener('click', () => {
             settingsModal.hidden = true;
             allowSubmit = true;
             settingsForm.submit();
+        });
+
+        settingsModal.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                closeModal();
+                return;
+            }
+            if (e.key !== 'Tab') {
+                return;
+            }
+
+            const focusable = Array.from(settingsModal.querySelectorAll(
+                'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+            ));
+            if (focusable.length === 0) {
+                return;
+            }
+
+            const first = focusable[0];
+            const last = focusable[focusable.length - 1];
+            if (e.shiftKey && document.activeElement === first) {
+                e.preventDefault();
+                last.focus();
+            } else if (!e.shiftKey && document.activeElement === last) {
+                e.preventDefault();
+                first.focus();
+            }
+        });
+    }
+
+    // Диалог назначения мастера на заявку.
+    const assignModal = document.getElementById('assign-modal');
+    const assignForm = document.getElementById('assign-form');
+    if (assignModal && assignForm) {
+        const assignDialog = assignModal.querySelector('.modal');
+        const assignCancel = document.getElementById('assign-cancel');
+        let assignLastFocused = null;
+        let assignHideTimer = null;
+
+        const closeAssign = () => {
+            assignModal.classList.add('closing');
+            window.clearTimeout(assignHideTimer);
+            assignHideTimer = window.setTimeout(() => {
+                assignModal.hidden = true;
+                assignModal.classList.remove('closing');
+            }, 120);
+            if (assignLastFocused && typeof assignLastFocused.focus === 'function') {
+                assignLastFocused.focus();
+            }
+        };
+
+        document.querySelectorAll('.js-assign').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                const bookingId = btn.getAttribute('data-booking-id');
+                const masterId = btn.getAttribute('data-master-id') || '0';
+                if (!bookingId) {
+                    return;
+                }
+
+                assignForm.action = '/admin/bookings/' + bookingId + '/assign';
+                assignForm.querySelectorAll('input[name="master_id"]').forEach((radio) => {
+                    radio.checked = radio.value === masterId;
+                });
+
+                assignLastFocused = btn;
+                window.clearTimeout(assignHideTimer);
+                assignModal.classList.remove('closing');
+                assignModal.hidden = false;
+                if (assignDialog) {
+                    assignDialog.setAttribute('tabindex', '-1');
+                    assignDialog.focus();
+                }
+            });
+        });
+
+        assignCancel.addEventListener('click', closeAssign);
+
+        assignModal.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                closeAssign();
+                return;
+            }
+            if (e.key !== 'Tab') {
+                return;
+            }
+            const focusable = Array.from(assignModal.querySelectorAll(
+                'input, button, [href], [tabindex]:not([tabindex="-1"])'
+            )).filter((el) => !el.disabled && el.offsetParent !== null);
+            if (focusable.length === 0) {
+                return;
+            }
+            const first = focusable[0];
+            const last = focusable[focusable.length - 1];
+            if (e.shiftKey && document.activeElement === first) {
+                e.preventDefault();
+                last.focus();
+            } else if (!e.shiftKey && document.activeElement === last) {
+                e.preventDefault();
+                first.focus();
+            }
         });
     }
 });

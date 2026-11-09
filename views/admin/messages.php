@@ -11,14 +11,15 @@ $messages = $messages ?? [];
 <?php else: ?>
     <div class="table-responsive">
     <table class="admin-table">
+        <caption class="visually-hidden">Сообщения</caption>
         <thead>
             <tr>
-                <th>Имя</th>
-                <th>Телефон</th>
-                <th>Email</th>
-                <th>Текст</th>
-                <th>Статус</th>
-                <th>Действия</th>
+                <th scope="col">Имя</th>
+                <th scope="col">Телефон</th>
+                <th scope="col">Email</th>
+                <th scope="col">Текст</th>
+                <th scope="col">Статус</th>
+                <th scope="col">Действия</th>
             </tr>
         </thead>
         <tbody>

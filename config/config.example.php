@@ -14,6 +14,8 @@ return [
         // Базовый URL без слэша на конце (например http://localhost или https://grand.ru)
         'url' => 'http://localhost',
         'debug' => true,
+        // На production: debug=false; force_https=true, если TLS терминируется прокси.
+        'force_https' => false,
     ],
     'db' => [
         'host' => 'localhost',

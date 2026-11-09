@@ -58,27 +58,10 @@ class BookingController
     public function store(): void
     {
         // --- Honeypot: скрытое поле-ловушка для ботов ---
+        // Ничего не создаём и не отвечаем ложным «успехом».
         if (trim((string) ($_POST['website'] ?? '')) !== '') {
-            redirect('/booking/success');
-        }
-
-        // --- Time-trap: заявка не может быть заполнена быстрее 3 секунд ---
-        $formTime = (int) ($_SESSION['booking_form_time'] ?? 0);
-        if ($formTime === 0 || (time() - $formTime) < 3) {
-            redirect('/booking/success');
-        }
-
-        // --- Лимит отправок по IP ---
-        $ip = (string) ($_SERVER['REMOTE_ADDR'] ?? '0.0.0.0');
-        if (RateLimit::tooMany($ip)) {
-            View::render('booking', [
-                'title' => 'Запись онлайн',
-                'services' => Service::active(),
-                'carClasses' => self::CAR_CLASSES,
-                'errors' => ['Слишком много заявок. Попробуйте позже.'],
-                'old' => [],
-            ]);
-            return;
+            http_response_code(204);
+            exit;
         }
 
         $services = Service::active();
@@ -96,6 +79,34 @@ class BookingController
                 ? array_map('intval', $_POST['service_ids'])
                 : [],
         ];
+
+        // --- Time-trap: заявка не может быть заполнена быстрее 3 секунд ---
+        // Не притворяемся успехом: просим обновить страницу и повторить.
+        $formTime = (int) ($_SESSION['booking_form_time'] ?? 0);
+        if ($formTime === 0 || (time() - $formTime) < 3) {
+            $_SESSION['booking_form_time'] = time();
+            View::render('booking', [
+                'title' => 'Запись онлайн',
+                'services' => $services,
+                'carClasses' => self::CAR_CLASSES,
+                'errors' => ['Форма устарела или заполнена слишком быстро. Проверьте данные и отправьте заявку ещё раз.'],
+                'old' => $old,
+            ]);
+            return;
+        }
+
+        // --- Лимит отправок по IP ---
+        $ip = (string) ($_SERVER['REMOTE_ADDR'] ?? '0.0.0.0');
+        if (RateLimit::tooMany($ip)) {
+            View::render('booking', [
+                'title' => 'Запись онлайн',
+                'services' => $services,
+                'carClasses' => self::CAR_CLASSES,
+                'errors' => ['Слишком много заявок. Попробуйте позже.'],
+                'old' => $old,
+            ]);
+            return;
+        }
 
         // CSRF-защита.
         if (!csrf_verify($_POST['csrf_token'] ?? null)) {
@@ -115,21 +126,21 @@ class BookingController
         // --- Имя ---
         $name = trim((string) ($_POST['name'] ?? ''));
         if ($name === '') {
-            $errors[] = 'Укажите ваше имя.';
+            $errors['name'] = 'Укажите ваше имя.';
         } elseif ((function_exists('mb_strlen') ? mb_strlen($name) : strlen($name)) > 100) {
-            $errors[] = 'Имя не должно быть длиннее 100 символов.';
+            $errors['name'] = 'Имя не должно быть длиннее 100 символов.';
         }
 
         // --- Телефон ---
         $phoneRaw = trim((string) ($_POST['phone'] ?? ''));
         $phone = '';
         if ($phoneRaw === '') {
-            $errors[] = 'Укажите номер телефона.';
+            $errors['phone'] = 'Укажите номер телефона.';
         } else {
             $phone = $this->normalizePhone($phoneRaw);
             $digits = preg_replace('/\D+/', '', $phone);
             if (preg_match('/^\d{10,15}$/', $digits) !== 1) {
-                $errors[] = 'Номер телефона должен содержать от 10 до 15 цифр.';
+                $errors['phone'] = 'Номер телефона должен содержать от 10 до 15 цифр.';
             }
         }
 
@@ -148,13 +159,13 @@ class BookingController
             }
         }
         if (count($serviceIds) === 0) {
-            $errors[] = 'Выберите хотя бы одну услугу.';
+            $errors['service_ids'] = 'Выберите хотя бы одну услугу.';
         }
 
         // --- Класс авто ---
         $carClass = trim((string) ($_POST['car_class'] ?? ''));
         if (!in_array($carClass, self::CAR_CLASSES, true)) {
-            $errors[] = 'Выберите класс автомобиля.';
+            $errors['car_class'] = 'Выберите класс автомобиля.';
         }
 
         // --- Марка/модель (необязательно) ---
@@ -169,7 +180,7 @@ class BookingController
             $dateClean = $dateErr === false
                 || ($dateErr['warning_count'] === 0 && $dateErr['error_count'] === 0);
             if ($dateObj === false || !$dateClean || $dateObj->format('Y-m-d') !== $prefDateRaw) {
-                $errors[] = 'Дата должна быть в формате ГГГГ-ММ-ДД.';
+                $errors['pref_date'] = 'Дата должна быть в формате ГГГГ-ММ-ДД.';
             } else {
                 $prefDate = $dateObj->format('Y-m-d');
             }
@@ -191,7 +202,7 @@ class BookingController
                 }
             }
             if ($timeObj === null) {
-                $errors[] = 'Время должно быть в формате ЧЧ:ММ (например 14:30).';
+                $errors['pref_time'] = 'Время должно быть в формате ЧЧ:ММ (например 14:30).';
             } else {
                 $prefTime = $timeObj->format('H:i:s');
             }

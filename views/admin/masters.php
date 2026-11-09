@@ -17,14 +17,15 @@ $flash = $flash ?? null;
 
 <div class="table-responsive">
 <table class="admin-table">
+    <caption class="visually-hidden">Мастера</caption>
     <thead>
         <tr>
-            <th>№</th>
-            <th>ФИО</th>
-            <th>Email</th>
-            <th>Телефон</th>
-            <th>Дата создания</th>
-            <th>Действия</th>
+            <th scope="col">№</th>
+            <th scope="col">ФИО</th>
+            <th scope="col">Email</th>
+            <th scope="col">Телефон</th>
+            <th scope="col">Дата создания</th>
+            <th scope="col">Действия</th>
         </tr>
     </thead>
     <tbody>

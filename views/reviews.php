@@ -28,7 +28,7 @@ $crumbs = [
                         $reviewDate = $ts !== false ? date('d.m.Y', $ts) : '—';
                     ?>
                     <div class="card">
-                        <p class="stars"><?= e($stars) ?></p>
+                        <p class="stars" aria-label="Оценка <?= (int) $rating ?> из 5"><span aria-hidden="true"><?= e($stars) ?></span></p>
                         <p><?= e((string)($review['text'] ?? '')) ?></p>
                         <p class="review-author"><?= e($author) ?></p>
                         <p class="review-date"><?= e($reviewDate) ?></p>

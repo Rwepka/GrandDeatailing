@@ -5,6 +5,7 @@ namespace App\Controller;
 
 use App\Core\Database;
 use App\Core\View;
+use App\Model\AuditLog;
 use App\Model\User;
 
 /**
@@ -117,6 +118,7 @@ class AdminMasterController
             'email' => $email,
             'phone' => $phone,
             'password_hash' => password_hash($password, PASSWORD_DEFAULT),
+            'must_change_password' => 1,
         ]);
 
         setFlash('Мастер добавлен.');
@@ -223,6 +225,9 @@ class AdminMasterController
         User::updateProfile($id, $name, $email, $phone);
         if ($password !== '') {
             User::updatePassword($id, password_hash($password, PASSWORD_DEFAULT));
+            // Отзываем «запомнить меня» мастера после смены пароля.
+            \App\Model\RememberToken::deleteAllForUser($id);
+            AuditLog::record('master.password', 'user', $id);
         }
 
         setFlash('Данные мастера обновлены.');

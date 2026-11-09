@@ -7,7 +7,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (toggle && menu) {
         toggle.addEventListener('click', () => {
-            menu.classList.toggle('open');
+            const open = menu.classList.toggle('open');
+            toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+            toggle.setAttribute('aria-label', open ? 'Закрыть меню' : 'Открыть меню');
         });
     }
 
@@ -37,14 +39,27 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         };
 
-        const show = (index) => {
+        const show = (index, focusStep = false) => {
             steps.forEach((step, i) => { step.hidden = i !== index; });
             indicators.forEach((li, i) => {
                 li.classList.toggle('active', i === index);
                 li.classList.toggle('done', i < index);
+                if (i === index) {
+                    li.setAttribute('aria-current', 'step');
+                } else {
+                    li.removeAttribute('aria-current');
+                }
             });
             current = index;
             updateNextButton();
+
+            if (focusStep) {
+                const heading = steps[index].querySelector('h2');
+                if (heading) {
+                    heading.setAttribute('tabindex', '-1');
+                    heading.focus();
+                }
+            }
         };
 
         form.addEventListener('click', (e) => {
@@ -52,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!btn) return;
             e.preventDefault();
             const next = current + (btn.hasAttribute('data-next') ? 1 : -1);
-            if (next >= 0 && next < steps.length) show(next);
+            if (next >= 0 && next < steps.length) show(next, true);
         });
 
         form.addEventListener('change', updateNextButton);
@@ -62,13 +77,8 @@ document.addEventListener('DOMContentLoaded', () => {
             : 0;
         show(Math.max(0, Math.min(initialStep, steps.length - 1)));
 
-        // Имя: только буквы, пробелы и дефис (без цифр и спецсимволов).
-        const nameInput = form.querySelector('input[name="name"]');
-        if (nameInput) {
-            nameInput.addEventListener('input', () => {
-                nameInput.value = nameInput.value.replace(/[^a-zA-Zа-яА-ЯёЁ\s-]/g, '');
-            });
-        }
+        // Имя не мутируем: серверная валидация есть, а апостроф/цифры могут быть
+        // частью реального имени (например, «O'Neil»).
     }
 
     // Плашка согласия на использование cookie.
@@ -80,6 +90,30 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         document.getElementById('cookie-accept')?.addEventListener('click', () => setConsent('1'));
         document.getElementById('cookie-decline')?.addEventListener('click', () => setConsent('0'));
+    }
+
+    // Карта: iframe грузим только по клику — без сторонних cookies и TBT заранее.
+    const mapLoad = document.getElementById('map-load');
+    if (mapLoad) {
+        mapLoad.addEventListener('click', () => {
+            const wrap = document.getElementById('map-wrap');
+            const src = mapLoad.getAttribute('data-src');
+            if (!wrap || !src) {
+                return;
+            }
+
+            const iframe = document.createElement('iframe');
+            iframe.src = src;
+            iframe.title = 'Карта: GRAND DETAILING, Туапсе';
+            iframe.style.width = '100%';
+            iframe.style.height = '400px';
+            iframe.style.border = '0';
+            iframe.setAttribute('allowfullscreen', '');
+            iframe.loading = 'lazy';
+
+            wrap.innerHTML = '';
+            wrap.appendChild(iframe);
+        });
     }
 
     // Черновик формы записи (cookie booking_draft).
@@ -274,4 +308,11 @@ document.addEventListener('DOMContentLoaded', () => {
         input.addEventListener('input', () => { input.value = formatPhone(input.value); });
         if (input.value) input.value = formatPhone(input.value);
     });
+
+    // Фокус на первое невалидное поле (a11y).
+    const firstInvalid = Array.from(document.querySelectorAll('[aria-invalid="true"]'))
+        .find((el) => el.offsetParent !== null);
+    if (firstInvalid) {
+        firstInvalid.focus();
+    }
 });

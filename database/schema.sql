@@ -45,6 +45,8 @@ CREATE TABLE users (
     email         VARCHAR(120)     NULL,
     phone         VARCHAR(20)      NOT NULL,
     password_hash VARCHAR(255)     NOT NULL,
+    must_change_password TINYINT(1) NOT NULL DEFAULT 0,
+    verified_at   DATETIME         NULL,
     discount      TINYINT UNSIGNED NOT NULL DEFAULT 0,
     created_at    DATETIME         NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
@@ -118,6 +120,7 @@ CREATE TABLE service_prices (
 CREATE TABLE bookings (
     id         INT UNSIGNED NOT NULL AUTO_INCREMENT,
     user_id    INT UNSIGNED NULL,
+    master_id  INT UNSIGNED NULL,
     car_id     INT UNSIGNED NULL,
     status     ENUM('new', 'confirmed', 'in_work', 'done', 'ready', 'cancelled') NOT NULL DEFAULT 'new',
     pref_date  DATE         NULL,
@@ -132,8 +135,10 @@ CREATE TABLE bookings (
     PRIMARY KEY (id),
     KEY idx_bookings_status (status),
     KEY idx_bookings_user (user_id),
+    KEY idx_bookings_master (master_id),
     KEY idx_bookings_car (car_id),
     CONSTRAINT fk_bookings_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE SET NULL,
+    CONSTRAINT fk_bookings_master FOREIGN KEY (master_id) REFERENCES users (id) ON DELETE SET NULL,
     CONSTRAINT fk_bookings_car FOREIGN KEY (car_id) REFERENCES cars (id) ON DELETE SET NULL
 ) ENGINE = InnoDB
   DEFAULT CHARACTER SET = utf8mb4
@@ -283,6 +288,44 @@ CREATE TABLE rate_limits (
   DEFAULT CHARACTER SET = utf8mb4
   COLLATE = utf8mb4_unicode_ci
   COMMENT = 'Лимит отправок форм по IP';
+
+-- ---------------------------------------------------------------------
+-- Неудачные попытки входа (throttle по аккаунту)
+-- ---------------------------------------------------------------------
+CREATE TABLE login_attempts (
+    id         INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    login_hash CHAR(64)     NOT NULL COMMENT 'sha256 от нормализованного логина',
+    ip         VARCHAR(45)  NOT NULL,
+    created_at DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    KEY idx_login_attempts_login (login_hash, created_at),
+    KEY idx_login_attempts_ip (ip, created_at)
+) ENGINE = InnoDB
+  DEFAULT CHARACTER SET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci
+  COMMENT = 'Неудачные попытки входа по аккаунту/IP';
+
+-- ---------------------------------------------------------------------
+-- Журнал действий (аудит)
+-- ---------------------------------------------------------------------
+CREATE TABLE audit_log (
+    id          INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    actor_id    INT UNSIGNED NULL,
+    action      VARCHAR(64)  NOT NULL,
+    entity_type VARCHAR(32)  NULL,
+    entity_id   INT UNSIGNED NULL,
+    meta        VARCHAR(500) NULL,
+    ip          VARCHAR(45)  NOT NULL,
+    created_at  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    KEY idx_audit_log_created (created_at),
+    KEY idx_audit_log_actor (actor_id),
+    KEY idx_audit_log_entity (entity_type, entity_id),
+    CONSTRAINT fk_audit_log_actor FOREIGN KEY (actor_id) REFERENCES users (id) ON DELETE SET NULL
+) ENGINE = InnoDB
+  DEFAULT CHARACTER SET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci
+  COMMENT = 'Журнал действий (аудит)';
 
 SET FOREIGN_KEY_CHECKS = 1;
 

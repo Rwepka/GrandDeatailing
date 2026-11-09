@@ -33,8 +33,8 @@ $flash = $flash ?? null;
 </form>
 
 <div class="modal-overlay" id="settings-modal" hidden>
-    <div class="modal">
-        <h2>Подтвердите изменения</h2>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="settings-modal-title" tabindex="-1">
+        <h2 id="settings-modal-title">Подтвердите изменения</h2>
         <p class="modal-warning">Внимание: изменения применяются сразу и необратимы.</p>
         <ul class="modal-changes" id="settings-changes"></ul>
         <div class="modal-actions">

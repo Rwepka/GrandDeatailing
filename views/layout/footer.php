@@ -1,6 +1,6 @@
 </main>
 <?php if (!isset($_COOKIE['cookie_consent'])): ?>
-<div class="cookie-banner" id="cookie-banner">
+<div class="cookie-banner" id="cookie-banner" role="region" aria-label="Согласие на использование cookie" aria-live="polite">
     <p class="cookie-banner-text">Мы используем cookie для работы сайта и анализа. Оставаясь, вы соглашаетесь с их использованием.</p>
     <div class="cookie-banner-actions">
         <button type="button" class="btn btn-accent btn-sm" id="cookie-accept">Согласен</button>

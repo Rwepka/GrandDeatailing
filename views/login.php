@@ -30,12 +30,14 @@ $old = $old ?? [];
 
                 <div class="field-group">
                     <label for="login">Телефон или email</label>
-                    <input type="text" name="login" id="login" placeholder="+7 900 000-00-00 или you@example.com" value="<?= e((string) ($old['login'] ?? '')) ?>">
+                    <input type="text" name="login" id="login" placeholder="+7 900 000-00-00 или you@example.com" value="<?= e((string) ($old['login'] ?? '')) ?>" autocomplete="username"<?= field_aria($errors, 'login', 'err-login') ?>>
+                    <?php if ($err = field_error($errors, 'login')): ?><p class="field-error" id="err-login"><?= e($err) ?></p><?php endif; ?>
                 </div>
 
                 <div class="field-group">
                     <label for="password">Пароль</label>
-                    <input type="password" name="password" id="password" placeholder="Ваш пароль">
+                    <input type="password" name="password" id="password" placeholder="Ваш пароль" autocomplete="current-password"<?= field_aria($errors, 'password', 'err-password') ?>>
+                    <?php if ($err = field_error($errors, 'password')): ?><p class="field-error" id="err-password"><?= e($err) ?></p><?php endif; ?>
                 </div>
 
                 <div class="field-group">

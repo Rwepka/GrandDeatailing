@@ -34,4 +34,15 @@ class RememberToken extends Model
         );
         $stmt->execute([$tokenHash]);
     }
+
+    /**
+     * Удалить все remember-токены пользователя (например, при смене пароля).
+     */
+    public static function deleteAllForUser(int $userId): void
+    {
+        $stmt = Database::connection()->prepare(
+            'DELETE FROM remember_tokens WHERE user_id = ?'
+        );
+        $stmt->execute([$userId]);
+    }
 }

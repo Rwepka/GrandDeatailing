@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Core\View;
+use App\Model\AuditLog;
 use App\Model\Booking;
 use App\Model\Car;
 use App\Model\Review;
@@ -29,6 +30,7 @@ class CabinetController
             'user' => $user,
             'bookings' => $bookings,
             'reviewedBookingIds' => $reviewedBookingIds,
+            'flash' => flash(),
         ]);
     }
 
@@ -76,17 +78,17 @@ class CabinetController
         // --- Марка ---
         $brand = trim((string) ($_POST['brand'] ?? ''));
         if ($brand === '') {
-            $errors[] = 'Укажите марку автомобиля.';
+            $errors['brand'] = 'Укажите марку автомобиля.';
         } elseif ((function_exists('mb_strlen') ? mb_strlen($brand) : strlen($brand)) > 60) {
-            $errors[] = 'Марка не должна быть длиннее 60 символов.';
+            $errors['brand'] = 'Марка не должна быть длиннее 60 символов.';
         }
 
         // --- Модель ---
         $model = trim((string) ($_POST['model'] ?? ''));
         if ($model === '') {
-            $errors[] = 'Укажите модель автомобиля.';
+            $errors['model'] = 'Укажите модель автомобиля.';
         } elseif ((function_exists('mb_strlen') ? mb_strlen($model) : strlen($model)) > 60) {
-            $errors[] = 'Модель не должна быть длиннее 60 символов.';
+            $errors['model'] = 'Модель не должна быть длиннее 60 символов.';
         }
 
         // --- Год (необязательно, 4 цифры, 1950–2026) ---
@@ -94,11 +96,11 @@ class CabinetController
         $yearRaw = trim((string) ($_POST['year'] ?? ''));
         if ($yearRaw !== '') {
             if (preg_match('/^\d{4}$/', $yearRaw) !== 1) {
-                $errors[] = 'Год должен состоять из 4 цифр.';
+                $errors['year'] = 'Год должен состоять из 4 цифр.';
             } else {
                 $yearInt = (int) $yearRaw;
                 if ($yearInt < 1950 || $yearInt > 2026) {
-                    $errors[] = 'Год должен быть в диапазоне 1950–2026.';
+                    $errors['year'] = 'Год должен быть в диапазоне 1950–2026.';
                 } else {
                     $year = $yearRaw;
                 }
@@ -171,12 +173,12 @@ class CabinetController
         $errors = [];
 
         if ($phoneRaw === '' || preg_match('/^\d{10,15}$/', $digits) !== 1) {
-            $errors[] = 'Укажите корректный номер телефона (10–15 цифр)';
+            $errors['phone'] = 'Укажите корректный номер телефона (10–15 цифр)';
         }
 
         $existing = User::findByPhone($phone);
         if ($existing !== null && (int) $existing['id'] !== (int) auth()['id']) {
-            $errors[] = 'Этот телефон уже используется';
+            $errors['phone'] = 'Этот телефон уже используется';
         }
 
         if ($errors !== []) {
@@ -210,13 +212,13 @@ class CabinetController
         $errors = [];
 
         if ($email !== null && filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
-            $errors[] = 'Укажите корректный email';
+            $errors['email'] = 'Укажите корректный email';
         }
 
         if ($email !== null) {
             $existing = User::findByEmail($email);
             if ($existing !== null && (int) $existing['id'] !== (int) auth()['id']) {
-                $errors[] = 'Этот email уже используется';
+                $errors['email'] = 'Этот email уже используется';
             }
         }
 
@@ -254,15 +256,15 @@ class CabinetController
         $errors = [];
 
         if ($current === '' || !password_verify($current, (string) $user['password_hash'])) {
-            $errors[] = 'Текущий пароль указан неверно';
+            $errors['current_password'] = 'Текущий пароль указан неверно';
         }
 
         if (strlen($password) < 8) {
-            $errors[] = 'Новый пароль должен быть не короче 8 символов';
+            $errors['password'] = 'Новый пароль должен быть не короче 8 символов';
         }
 
         if ($password !== $confirmation) {
-            $errors[] = 'Пароли не совпадают';
+            $errors['password_confirmation'] = 'Пароли не совпадают';
         }
 
         if ($errors !== []) {
@@ -277,7 +279,82 @@ class CabinetController
         }
 
         User::updatePassword((int) $user['id'], password_hash($password, PASSWORD_DEFAULT));
+        AuditLog::record('password.change', 'user', (int) $user['id']);
+
+        // Отзываем «запомнить меня» на всех устройствах и ротируем текущую сессию.
+        \App\Model\RememberToken::deleteAllForUser((int) $user['id']);
+        forgetRememberUser();
+        session_regenerate_id(true);
+
         setFlash('Пароль изменён.');
         redirect('/cabinet/security');
+    }
+
+    public function forcePasswordChangeForm(): void
+    {
+        requireAuth();
+        $user = auth();
+
+        if (empty($user['must_change_password'])) {
+            redirect('/cabinet');
+        }
+
+        View::render('password_change', [
+            'title' => 'Смена временного пароля',
+            'user' => $user,
+            'errors' => [],
+        ]);
+    }
+
+    public function forcePasswordChange(): void
+    {
+        requireAuth();
+        $user = auth();
+
+        if (empty($user['must_change_password'])) {
+            redirect('/cabinet');
+        }
+
+        if (!csrf_verify($_POST['csrf_token'] ?? null)) {
+            http_response_code(419);
+            View::render('password_change', [
+                'title' => 'Смена временного пароля',
+                'user' => $user,
+                'errors' => ['Сессия устарела. Обновите страницу и попробуйте ещё раз.'],
+            ]);
+            return;
+        }
+
+        $password = (string) ($_POST['password'] ?? '');
+        $confirmation = (string) ($_POST['password_confirmation'] ?? '');
+
+        $errors = [];
+        if (strlen($password) < 8) {
+            $errors[] = 'Новый пароль должен быть не короче 8 символов';
+        }
+        if ($password !== $confirmation) {
+            $errors[] = 'Пароли не совпадают';
+        }
+
+        if ($errors !== []) {
+            View::render('password_change', [
+                'title' => 'Смена временного пароля',
+                'user' => $user,
+                'errors' => $errors,
+            ]);
+            return;
+        }
+
+        User::updatePassword((int) $user['id'], password_hash($password, PASSWORD_DEFAULT));
+        User::setMustChangePassword((int) $user['id'], false);
+        AuditLog::record('password.change', 'user', (int) $user['id'], 'forced');
+
+        // Отзываем «запомнить меня» и ротируем сессию.
+        \App\Model\RememberToken::deleteAllForUser((int) $user['id']);
+        forgetRememberUser();
+        session_regenerate_id(true);
+
+        setFlash('Пароль изменён. Теперь вы можете пользоваться кабинетом.');
+        redirect('/cabinet');
     }
 }

@@ -71,21 +71,21 @@ class ContactController
         // --- Имя ---
         $name = trim((string) ($_POST['name'] ?? ''));
         if ($name === '') {
-            $errors[] = 'Укажите ваше имя.';
+            $errors['name'] = 'Укажите ваше имя.';
         } elseif ((function_exists('mb_strlen') ? mb_strlen($name) : strlen($name)) > 100) {
-            $errors[] = 'Имя не должно быть длиннее 100 символов.';
+            $errors['name'] = 'Имя не должно быть длиннее 100 символов.';
         }
 
         // --- Телефон ---
         $phoneRaw = trim((string) ($_POST['phone'] ?? ''));
         $phone = '';
         if ($phoneRaw === '') {
-            $errors[] = 'Укажите номер телефона.';
+            $errors['phone'] = 'Укажите номер телефона.';
         } else {
             $phone = normalize_phone($phoneRaw);
             $digits = preg_replace('/\D+/', '', $phone);
             if (preg_match('/^\d{10,15}$/', $digits) !== 1) {
-                $errors[] = 'Номер телефона должен содержать от 10 до 15 цифр.';
+                $errors['phone'] = 'Номер телефона должен содержать от 10 до 15 цифр.';
             }
         }
 
@@ -94,7 +94,7 @@ class ContactController
         $emailRaw = trim((string) ($_POST['email'] ?? ''));
         if ($emailRaw !== '') {
             if (filter_var($emailRaw, FILTER_VALIDATE_EMAIL) === false) {
-                $errors[] = 'Укажите корректный email.';
+                $errors['email'] = 'Укажите корректный email.';
             } else {
                 $email = $emailRaw;
             }

@@ -6,6 +6,7 @@
 $user = $user ?? [];
 $bookings = $bookings ?? [];
 $reviewedBookingIds = $reviewedBookingIds ?? [];
+$flash = $flash ?? null;
 
 $statusLabels = [
     'new' => 'Новая',
@@ -26,6 +27,10 @@ $crumbs = [
         <div class="cabinet-layout">
             <?php $active = 'cabinet'; require BASE_PATH . '/views/cabinet/_sidebar.php'; ?>
             <div class="cabinet-content">
+                <h1>Личный кабинет</h1>
+                <?php if (!empty($flash)): ?>
+                    <div class="flash" role="status"><?= e((string) $flash) ?></div>
+                <?php endif; ?>
                 <p class="lead">Здравствуйте, <?= e((string) ($user['name'] ?? '')) ?>!</p>
 
                 <?php if (empty($bookings)): ?>

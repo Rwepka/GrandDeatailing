@@ -80,6 +80,30 @@ mysql -u root -p < database/seed.sql
 2. Выберите БД → вкладка **«Импорт»** → выберите файл `database/schema.sql` → «Вперёд».
 3. Повторите для `database/seed.sql`, если нужны демо-данные.
 
+### Миграции для уже развёрнутой базы
+
+Свежая установка (`schema.sql`) уже содержит всё. Для существующей базы примените по порядку:
+
+```bash
+mysql -u <user> -p <db> < database/migrations/002_must_change_password.sql
+mysql -u <user> -p <db> < database/migrations/003_verified_at.sql
+mysql -u <user> -p <db> < database/migrations/004_login_attempts.sql
+mysql -u <user> -p <db> < database/migrations/005_audit_log.sql
+mysql -u <user> -p <db> < database/migrations/006_booking_master.sql
+```
+
+Все миграции идемпотентны (повторный запуск безопасен).
+
+### Фоновая очистка неподтверждённых клиентов
+
+Раз в сутки через cron (REG.RU):
+
+```bash
+php /path/to/site/scripts/cleanup_unverified_clients.php
+```
+
+Удаляет клиентов без `verified_at` старше 30 дней; связанные заявки анонимизируются, отзывы удаляются.
+
 ---
 
 ## 5. Настройка `config/config.php`
@@ -118,32 +142,27 @@ mysql -u root -p < database/seed.sql
 site/
 ├── public/                 # ВЕБ-КОРЕНЬ — домен должен указывать сюда
 │   ├── index.php           # фронт-контроллер (единая точка входа) + маршруты
-│   ├── .htaccess           # rewrite всех запросов на index.php
-│   ├── robots.txt
-│   └── assets/             # css/ js/ img/ + uploads/
+│   ├── .htaccess           # rewrite + заголовки безопасности/кэш/сжатие
+│   └── assets/             # css/ js/ img/ (hero-* — WebP/JPG варианты) + uploads/
 ├── src/                    # PHP-код приложения (ВНЕ веб-корня)
-│   ├── bootstrap.php       # автозагрузчик классов (namespace App\)
-│   ├── helpers.php         # config(), e(), url(), asset()
+│   ├── bootstrap.php       # сессии, автозагрузчик, debug
+│   ├── helpers.php         # config(), e(), url(), asset(), nav_attrs(), field_aria(), is_https()
 │   ├── Core/
 │   │   ├── Router.php      # маршрутизация (get/post, параметры {id})
 │   │   ├── Database.php    # PDO-соединение (singleton)
 │   │   └── View.php        # рендер: layout/header + view + layout/footer
-│   ├── Controller/
-│   │   └── HomeController.php
-│   └── Model/
-│       ├── Model.php       # базовый класс (all(), find())
-│       └── Service.php     # модель услуги (таблица services)
-├── views/                  # шаблоны
-│   ├── layout/header.php   # общий «шапка» (открывает <html>…<main>)
-│   ├── layout/footer.php   # общий «подвал» (закрывает </main>…</html>)
-│   ├── home.php
-│   └── 404.php
-├── config/config.php       # настройки БД и приложения (ВНЕ веб-корня)
-├── database/               # schema.sql, seed.sql
-├── storage/uploads/        # загрузки (вне веб-корня)
+│   ├── Controller/         # публичные, Auth, Cabinet, Admin* (вкл. AdminAuditController, RobotsController)
+│   └── Model/              # User, Booking, Service, ServicePrice, LoginAttempt, AuditLog, Setting, …
+├── views/                  # layout, admin, cabinet, публичные страницы
+├── config/                 # config.php (не коммитится) + config.example.php
+├── database/               # schema.sql, seed.sql, migrations/002–006
+├── scripts/                # cleanup_unverified_clients.php (cron)
+├── storage/                # sessions/, uploads/ (вне веб-корня)
 ├── router.php              # router для встроенного сервера PHP (php -S)
 └── .htaccess               # защитный: закрывает src/config/views/database/storage
 ```
+
+`/robots.txt` и `/sitemap.xml` генерируются динамически (`RobotsController`, `SitemapController`) из `config('app.url')`.
 
 **Ключевое правило:** браузер должен видеть только содержимое `public/`. Весь PHP-код, конфигурация, шаблоны и загрузки лежат вне веб-корня и закрыты защитным `.htaccess`.
 

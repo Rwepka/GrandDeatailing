@@ -15,6 +15,7 @@ use App\Core\Router;
 use App\Controller\HomeController;
 use App\Controller\ServiceController;
 use App\Controller\SitemapController;
+use App\Controller\RobotsController;
 use App\Controller\BookingController;
 use App\Controller\ContactController;
 use App\Controller\NewsController;
@@ -29,6 +30,7 @@ use App\Controller\AdminMessageController;
 use App\Controller\AdminMasterController;
 use App\Controller\AdminClientController;
 use App\Controller\AdminSettingsController;
+use App\Controller\AdminAuditController;
 
 $router = new Router();
 
@@ -46,6 +48,7 @@ $router->get('/reviews/create', [ReviewController::class, 'create']);
 $router->post('/reviews', [ReviewController::class, 'store']);
 $router->get('/news', [NewsController::class, 'index']);
 $router->get('/sitemap.xml', [SitemapController::class, 'index']);
+$router->get('/robots.txt', [RobotsController::class, 'index']);
 
 // --- Авторизация ---
 $router->get('/register', [AuthController::class, 'showRegister']);
@@ -63,6 +66,8 @@ $router->get('/cabinet/security', [CabinetController::class, 'security']);
 $router->post('/cabinet/security/phone', [CabinetController::class, 'updatePhone']);
 $router->post('/cabinet/security/email', [CabinetController::class, 'updateEmail']);
 $router->post('/cabinet/security/password', [CabinetController::class, 'updatePassword']);
+$router->get('/cabinet/security/password-change', [CabinetController::class, 'forcePasswordChangeForm']);
+$router->post('/cabinet/security/password-change', [CabinetController::class, 'forcePasswordChange']);
 
 // --- Админ-панель (только для администратора) ---
 $router->get('/admin', [AdminController::class, 'dashboard']);
@@ -72,6 +77,9 @@ $router->get('/admin/bookings/create', [AdminController::class, 'createBooking']
 $router->post('/admin/bookings', [AdminController::class, 'storeBooking']);
 $router->post('/admin/bookings/{id}/status', [AdminController::class, 'updateStatus']);
 $router->post('/admin/bookings/{id}/create-client', [AdminController::class, 'createClient']);
+$router->post('/admin/bookings/{id}/link-existing', [AdminController::class, 'confirmLink']);
+$router->post('/admin/bookings/{id}/take', [AdminController::class, 'takeBooking']);
+$router->post('/admin/bookings/{id}/assign', [AdminController::class, 'assignMaster']);
 $router->post('/admin/bookings/{id}/delete', [AdminController::class, 'deleteBooking']);
 $router->get('/admin/services', [AdminServiceController::class, 'index']);
 $router->get('/admin/services/create', [AdminServiceController::class, 'create']);
@@ -94,8 +102,10 @@ $router->get('/admin/masters/{id}/edit', [AdminMasterController::class, 'edit'])
 $router->post('/admin/masters/{id}/update', [AdminMasterController::class, 'update']);
 $router->get('/admin/clients', [AdminClientController::class, 'index']);
 $router->post('/admin/clients/{id}/delete', [AdminClientController::class, 'delete']);
+$router->post('/admin/clients/{id}/verify', [AdminClientController::class, 'verify']);
 $router->get('/admin/settings', [AdminSettingsController::class, 'index']);
 $router->post('/admin/settings', [AdminSettingsController::class, 'store']);
+$router->get('/admin/audit', [AdminAuditController::class, 'index']);
 
 // По мере разработки добавляются:
 //   $router->get('/login', [AuthController::class, 'showLogin']);

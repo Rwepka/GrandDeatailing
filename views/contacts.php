@@ -56,9 +56,20 @@ $crumbs = [
             <?php endif; ?>
         </div>
 
-        <?php $mapLng = (string) setting('map_lng', '39.087091'); $mapLat = (string) setting('map_lat', '44.104854'); ?>
-        <div class="map">
-            <iframe src="https://yandex.ru/map-widget/v1/?ll=<?= e($mapLng) ?>%2C<?= e($mapLat) ?>&z=17&mode=whatshere&whatshere%5Bpoint%5D=<?= e($mapLng) ?>%2C<?= e($mapLat) ?>&whatshere%5Bzoom%5D=17" width="100%" height="400" style="border:0;" allowfullscreen loading="lazy"></iframe>
+        <?php
+        $mapLng = (string) setting('map_lng', '39.087091');
+        $mapLat = (string) setting('map_lat', '44.104854');
+        $mapSrc = 'https://yandex.ru/map-widget/v1/?ll=' . $mapLng . '%2C' . $mapLat
+            . '&z=17&mode=whatshere&whatshere%5Bpoint%5D=' . $mapLng . '%2C' . $mapLat
+            . '&whatshere%5Bzoom%5D=17';
+        ?>
+        <div class="map" id="map-wrap">
+            <div class="map-placeholder" id="map-placeholder">
+                <p>Карта загрузится по нажатию — сторонние cookies не подключаются заранее.</p>
+                <button type="button" class="btn btn-accent" id="map-load" data-src="<?= e($mapSrc) ?>">
+                    Показать карту
+                </button>
+            </div>
         </div>
 
         <h2>Обратная связь</h2>
@@ -69,15 +80,18 @@ $crumbs = [
 
                 <div class="field-group">
                     <label for="name">Имя</label>
-                    <input type="text" name="name" id="name" placeholder="Иван" value="<?= e((string) ($old['name'] ?? '')) ?>">
+                    <input type="text" name="name" id="name" placeholder="Иван" value="<?= e((string) ($old['name'] ?? '')) ?>"<?= field_aria($errors, 'name', 'err-name') ?>>
+                    <?php if ($err = field_error($errors, 'name')): ?><p class="field-error" id="err-name"><?= e($err) ?></p><?php endif; ?>
                 </div>
                 <div class="field-group">
                     <label for="phone">Телефон</label>
-                    <input type="tel" name="phone" id="phone" placeholder="+7 900 000-00-00" value="<?= e((string) ($old['phone'] ?? '')) ?>">
+                    <input type="tel" name="phone" id="phone" placeholder="+7 900 000-00-00" value="<?= e((string) ($old['phone'] ?? '')) ?>"<?= field_aria($errors, 'phone', 'err-phone') ?>>
+                    <?php if ($err = field_error($errors, 'phone')): ?><p class="field-error" id="err-phone"><?= e($err) ?></p><?php endif; ?>
                 </div>
                 <div class="field-group">
                     <label for="email">Email <small>(необязательно)</small></label>
-                    <input type="email" name="email" id="email" placeholder="you@example.com" value="<?= e((string) ($old['email'] ?? '')) ?>">
+                    <input type="email" name="email" id="email" placeholder="you@example.com" value="<?= e((string) ($old['email'] ?? '')) ?>"<?= field_aria($errors, 'email', 'err-email') ?>>
+                    <?php if ($err = field_error($errors, 'email')): ?><p class="field-error" id="err-email"><?= e($err) ?></p><?php endif; ?>
                 </div>
                 <div class="field-group">
                     <label for="text">Сообщение <small>(необязательно)</small></label>

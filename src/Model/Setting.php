@@ -12,12 +12,16 @@ class Setting extends Model
 {
     protected static string $table = 'settings';
 
+    /** @var array<string, string>|null */
+    private static ?array $cache = null;
+
     public static function get(string $key, ?string $default = null): ?string
     {
-        $stmt = Database::connection()->prepare('SELECT value FROM settings WHERE `key` = ?');
-        $stmt->execute([$key]);
-        $value = $stmt->fetchColumn();
-        return $value === false ? $default : (string) $value;
+        if (self::$cache === null) {
+            self::$cache = self::all();
+        }
+
+        return array_key_exists($key, self::$cache) ? self::$cache[$key] : $default;
     }
 
     public static function set(string $key, string $value): void
@@ -26,6 +30,9 @@ class Setting extends Model
             'INSERT INTO settings (`key`, value) VALUES (?, ?) ON DUPLICATE KEY UPDATE value = VALUES(value)'
         );
         $stmt->execute([$key, $value]);
+
+        // Сбрасываем кэш, чтобы новые значения сразу были видны.
+        self::$cache = null;
     }
 
     /**

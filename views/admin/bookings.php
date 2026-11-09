@@ -5,6 +5,7 @@
  */
 $bookings = $bookings ?? [];
 $flash = $flash ?? null;
+$masters = $masters ?? [];
 
 $statuses = [
     'new' => 'Новая',
@@ -28,15 +29,17 @@ $statuses = [
     <input type="text" class="table-search" placeholder="Поиск: имя, телефон, авто..." data-table-search="#bookings-table">
     <div class="table-responsive">
     <table class="admin-table" id="bookings-table">
+        <caption class="visually-hidden">Заявки</caption>
         <thead>
             <tr>
-                <th>№</th>
-                <th>Клиент</th>
-                <th>Автомобиль</th>
-                <th>Дата/время</th>
-                <th>Стоимость</th>
-                <th>Статус</th>
-                <th>Действия</th>
+                <th scope="col">№</th>
+                <th scope="col">Клиент</th>
+                <th scope="col">Мастер</th>
+                <th scope="col">Автомобиль</th>
+                <th scope="col">Дата/время</th>
+                <th scope="col">Стоимость</th>
+                <th scope="col">Статус</th>
+                <th scope="col">Действия</th>
             </tr>
         </thead>
         <tbody>
@@ -69,6 +72,23 @@ $statuses = [
                         <?= e((string) ($booking['client_name'] ?: '—')) ?><br>
                         <?= e((string) ($booking['client_phone'] ?: '')) ?>
                     </td>
+                    <td>
+                        <div class="master-cell">
+                            <span class="master-name"><?= e((string) (($booking['master_name'] ?? '') ?: '—')) ?></span>
+                            <?php if (empty($booking['master_id'])): ?>
+                                <form method="POST" action="<?= e(url('/admin/bookings/' . $booking['id'] . '/take')) ?>" class="inline-form">
+                                    <?= csrf_field() ?>
+                                    <button type="submit" class="btn btn-outline btn-sm">Взять на себя</button>
+                                </form>
+                            <?php endif; ?>
+                            <?php if (isAdmin()): ?>
+                                <button type="button" class="btn btn-outline btn-sm js-assign"
+                                        data-booking-id="<?= e($booking['id']) ?>"
+                                        data-master-id="<?= (int) ($booking['master_id'] ?? 0) ?>"
+                                        aria-haspopup="dialog">Назначить</button>
+                            <?php endif; ?>
+                        </div>
+                    </td>
                     <td><?= e((string) ($booking['car_info'] ?: '—')) ?></td>
                     <td><?= e($dateTime !== '' ? $dateTime : '—') ?></td>
                     <td><?= e($costText) ?></td>
@@ -77,7 +97,7 @@ $statuses = [
                         <form method="POST" action="<?= e(url('/admin/bookings/' . $booking['id'] . '/status')) ?>" class="inline-form" id="status-form-<?= e($booking['id']) ?>" data-cost-form>
                             <?= csrf_field() ?>
                             <input type="hidden" name="cost" value="">
-                            <select name="status" id="status-select-<?= e($booking['id']) ?>">
+                            <select name="status" id="status-select-<?= e($booking['id']) ?>" aria-label="Статус заявки №<?= e($booking['id']) ?>">
                                 <?php foreach ($statuses as $code => $label): ?>
                                     <option value="<?= e($code) ?>"<?= $code === $status ? ' selected' : '' ?>><?= e($label) ?></option>
                                 <?php endforeach; ?>
@@ -102,6 +122,33 @@ $statuses = [
         </tbody>
     </table>
     </div>
+<?php endif; ?>
+
+<?php if (isAdmin()): ?>
+<div class="modal-overlay" id="assign-modal" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="assign-modal-title" tabindex="-1">
+        <h2 id="assign-modal-title">Назначить мастера</h2>
+        <form method="POST" action="" id="assign-form">
+            <?= csrf_field() ?>
+            <div class="assign-list">
+                <label class="assign-option">
+                    <input type="radio" name="master_id" value="0">
+                    <span>— не назначен —</span>
+                </label>
+                <?php foreach ($masters as $m): ?>
+                    <label class="assign-option">
+                        <input type="radio" name="master_id" value="<?= e((string) $m['id']) ?>">
+                        <span><?= e((string) $m['name']) ?></span>
+                    </label>
+                <?php endforeach; ?>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-outline" id="assign-cancel">Отмена</button>
+                <button type="submit" class="btn btn-accent">Назначить</button>
+            </div>
+        </form>
+    </div>
+</div>
 <?php endif; ?>
 
 <script>

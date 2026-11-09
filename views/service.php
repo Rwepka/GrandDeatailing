@@ -53,7 +53,7 @@ $crumbs = [
 
         <p>Категория: <?= e($categoryTitle ?? '—') ?></p>
 
-        <p><a href="<?= e(url('/services')) ?>">← Все услуги</a></p>
+        <p><a href="<?= e(url('/services')) ?>" class="link-light">← Все услуги</a></p>
 
         <a href="<?= e(url('/booking')) ?>" class="btn btn-accent">Записаться</a>
     </div>

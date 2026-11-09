@@ -13,14 +13,15 @@ $categoryTitles = $categoryTitles ?? [];
 
 <div class="table-responsive">
 <table class="admin-table">
+    <caption class="visually-hidden">Услуги</caption>
     <thead>
         <tr>
-            <th>Название</th>
-            <th>Категория</th>
-            <th>Цена</th>
-            <th>Длительность (мин)</th>
-            <th>Статус</th>
-            <th>Действия</th>
+            <th scope="col">Название</th>
+            <th scope="col">Категория</th>
+            <th scope="col">Цена</th>
+            <th scope="col">Длительность (мин)</th>
+            <th scope="col">Статус</th>
+            <th scope="col">Действия</th>
         </tr>
     </thead>
     <tbody>

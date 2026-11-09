@@ -5,6 +5,7 @@ namespace App\Controller;
 
 use App\Core\Database;
 use App\Core\View;
+use App\Model\LoginAttempt;
 use App\Model\User;
 use App\Model\RateLimit;
 
@@ -67,21 +68,21 @@ class AuthController
         // --- Имя ---
         $name = trim((string) ($_POST['name'] ?? ''));
         if ($name === '') {
-            $errors[] = 'Укажите ваше имя.';
+            $errors['name'] = 'Укажите ваше имя.';
         } elseif ((function_exists('mb_strlen') ? mb_strlen($name) : strlen($name)) > 100) {
-            $errors[] = 'Имя не должно быть длиннее 100 символов.';
+            $errors['name'] = 'Имя не должно быть длиннее 100 символов.';
         }
 
         // --- Телефон ---
         $phoneRaw = trim((string) ($_POST['phone'] ?? ''));
         $phone = '';
         if ($phoneRaw === '') {
-            $errors[] = 'Укажите номер телефона.';
+            $errors['phone'] = 'Укажите номер телефона.';
         } else {
             $phone = $this->normalizePhone($phoneRaw);
             $digits = preg_replace('/\D+/', '', $phone);
             if (preg_match('/^\d{10,15}$/', $digits) !== 1) {
-                $errors[] = 'Номер телефона должен содержать от 10 до 15 цифр.';
+                $errors['phone'] = 'Номер телефона должен содержать от 10 до 15 цифр.';
             }
         }
 
@@ -90,7 +91,7 @@ class AuthController
         $email = null;
         if ($emailRaw !== '') {
             if (filter_var($emailRaw, FILTER_VALIDATE_EMAIL) === false) {
-                $errors[] = 'Укажите корректный email.';
+                $errors['email'] = 'Укажите корректный email.';
             } else {
                 $email = $emailRaw;
             }
@@ -100,21 +101,20 @@ class AuthController
         $password = (string) ($_POST['password'] ?? '');
         $passwordConfirmation = (string) ($_POST['password_confirmation'] ?? '');
         if ($password === '') {
-            $errors[] = 'Укажите пароль.';
+            $errors['password'] = 'Укажите пароль.';
         } elseif ((function_exists('mb_strlen') ? mb_strlen($password) : strlen($password)) < 8) {
-            $errors[] = 'Пароль должен быть не короче 8 символов.';
+            $errors['password'] = 'Пароль должен быть не короче 8 символов.';
         }
         if ($passwordConfirmation !== $password) {
-            $errors[] = 'Пароли не совпадают.';
+            $errors['password_confirmation'] = 'Пароли не совпадают.';
         }
 
-        // --- Уникальность телефона и email ---
+        // --- Уникальность телефона и email (нейтральное сообщение — без user enumeration) ---
         if ($errors === []) {
-            if (User::findByPhone($phone) !== null) {
-                $errors[] = 'Телефон уже зарегистрирован';
-            }
-            if ($email !== null && User::findByEmail($email) !== null) {
-                $errors[] = 'Email уже зарегистрирован';
+            $phoneTaken = User::findByPhone($phone) !== null;
+            $emailTaken = $email !== null && User::findByEmail($email) !== null;
+            if ($phoneTaken || $emailTaken) {
+                $errors['general'] = 'Не удалось завершить регистрацию: возможно, аккаунт с такими данными уже существует. Войдите или восстановите доступ.';
             }
         }
 
@@ -157,6 +157,31 @@ class AuthController
 
     public function login(): void
     {
+        // Rate limit: не более 10 попыток входа за 15 минут с одного IP.
+        $ip = (string) ($_SERVER['REMOTE_ADDR'] ?? '0.0.0.0');
+        if (RateLimit::tooMany($ip, 10, 900)) {
+            http_response_code(429);
+            View::render('login', [
+                'title' => 'Вход',
+                'errors' => ['Слишком много попыток входа. Попробуйте позже.'],
+                'old' => [],
+            ]);
+            return;
+        }
+
+        // Throttle по аккаунту: не более 5 неудачных попыток за 15 минут.
+        $loginKey = $this->normalizeLoginKey((string) ($_POST['login'] ?? ''));
+        $loginHash = $loginKey === '' ? '' : hash('sha256', $loginKey);
+        if ($loginHash !== '' && LoginAttempt::tooMany($loginHash, 5, 900)) {
+            http_response_code(429);
+            View::render('login', [
+                'title' => 'Вход',
+                'errors' => ['Слишком много попыток входа для этого аккаунта. Попробуйте позже.'],
+                'old' => [],
+            ]);
+            return;
+        }
+
         $old = [
             'login' => trim((string) ($_POST['login'] ?? '')),
         ];
@@ -176,12 +201,12 @@ class AuthController
 
         $login = trim((string) ($_POST['login'] ?? ''));
         if ($login === '') {
-            $errors[] = 'Укажите телефон или email.';
+            $errors['login'] = 'Укажите телефон или email.';
         }
 
         $password = (string) ($_POST['password'] ?? '');
         if ($password === '') {
-            $errors[] = 'Укажите пароль.';
+            $errors['password'] = 'Укажите пароль.';
         }
 
         $user = null;
@@ -193,7 +218,15 @@ class AuthController
             }
 
             if ($user === null || !password_verify($password, (string) ($user['password_hash'] ?? ''))) {
-                $errors[] = 'Неверный логин или пароль';
+                RateLimit::record($ip);
+                if ($loginHash !== '') {
+                    LoginAttempt::record($loginHash, $ip);
+                }
+                error_log('GRAND DETAILING: failed login from ' . $ip);
+                $errors['general'] = 'Неверный логин или пароль';
+            } elseif (password_needs_rehash((string) $user['password_hash'], PASSWORD_DEFAULT)) {
+                // Пароль устаревшего формата — перехешируем прозрачно.
+                User::updatePassword((int) $user['id'], password_hash($password, PASSWORD_DEFAULT));
             }
         }
 
@@ -210,7 +243,18 @@ class AuthController
             rememberUser((int) $user['id']);
         }
 
+        // Успешный вход — сбрасываем счётчик неудач для аккаунта.
+        if ($loginHash !== '') {
+            LoginAttempt::clear($loginHash);
+        }
+
         login((int) $user['id']);
+
+        // Временный пароль — принудительная смена при первом входе.
+        if (!empty($user['must_change_password'])) {
+            redirect('/cabinet/security/password-change');
+        }
+
         redirect(isMaster() ? '/admin/bookings' : '/cabinet');
     }
 
@@ -224,6 +268,21 @@ class AuthController
         forgetRememberUser();
         logout();
         redirect('/');
+    }
+
+    /**
+     * Ключ аккаунта для throttle: email в нижнем регистре или нормализованный телефон.
+     */
+    private function normalizeLoginKey(string $login): string
+    {
+        $login = trim($login);
+        if ($login === '') {
+            return '';
+        }
+
+        return str_contains($login, '@')
+            ? strtolower($login)
+            : $this->normalizePhone($login);
     }
 
     /**

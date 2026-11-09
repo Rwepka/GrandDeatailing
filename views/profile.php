@@ -23,6 +23,7 @@ $crumbs = [
         <div class="cabinet-layout">
             <?php $active = 'profile'; require BASE_PATH . '/views/cabinet/_sidebar.php'; ?>
             <div class="cabinet-content">
+        <h1>Профиль</h1>
         <div class="card">
             <p>Имя: <?= e((string) ($user['name'] ?? '—')) ?></p>
             <p>Телефон: <?= e((string) ($user['phone'] ?? '—')) ?></p>

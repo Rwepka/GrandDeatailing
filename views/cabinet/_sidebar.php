@@ -9,9 +9,9 @@ $items = [
 ];
 ?>
 <aside class="cabinet-sidebar">
-    <nav class="cabinet-menu">
+    <nav class="cabinet-menu" aria-label="Меню кабинета">
         <?php foreach ($items as $key => [$label, $href]): ?>
-            <a href="<?= e(url($href)) ?>" class="<?= $key === $active ? 'active' : '' ?>"><?= e($label) ?></a>
+            <a href="<?= e(url($href)) ?>"<?= nav_attrs($key === $active) ?>><?= e($label) ?></a>
         <?php endforeach; ?>
     </nav>
     <form method="POST" action="<?= e(url('/logout')) ?>" class="cabinet-logout">
