@@ -138,6 +138,24 @@ php /path/to/site/scripts/cleanup_unverified_clients.php
 
 Значения читаются хелпером `config('db.host')`, `config('app.url')` и т.д.
 
+### Production-конфигурация и релиз
+
+На сервере используйте шаблон `config/config.production.example.php` (debug выключен, HTTPS включён):
+
+```bash
+cp config/config.production.example.php config/config.php
+```
+
+Проверка готовности и сборка архива:
+
+```bash
+php scripts/preflight.php --local       # локально
+php scripts/preflight.php               # на сервере после config.php
+php scripts/build-release.php /path/to/release
+```
+
+Полный чек-лист — [docs/RELEASE-CHECKLIST.md](docs/RELEASE-CHECKLIST.md), SEO и индексация — [docs/SEO-DEPLOY.md](docs/SEO-DEPLOY.md).
+
 ---
 
 ## 6. Структура проекта
@@ -158,9 +176,9 @@ site/
 │   ├── Controller/         # публичные, Auth, Cabinet, Admin* (вкл. AdminAuditController, RobotsController)
 │   └── Model/              # User, Booking, Service, ServicePrice, LoginAttempt, AuditLog, Setting, …
 ├── views/                  # layout, admin, cabinet, публичные страницы
-├── config/                 # config.php (не коммитится) + config.example.php
+├── config/                 # config.php (не коммитится) + config.example.php + production-шаблон
 ├── database/               # schema.sql, seed.sql, migrations/001–008
-├── scripts/                # cleanup_unverified_clients.php (cron)
+├── scripts/                # preflight.php, build-release.php, IndexNow, cleanup cron
 ├── storage/                # sessions/, uploads/ (вне веб-корня)
 ├── router.php              # router для встроенного сервера PHP (php -S)
 └── .htaccess               # защитный: закрывает src/config/views/database/storage

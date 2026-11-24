@@ -2,18 +2,29 @@
 
 Пошаговая инструкция для выкладки правок и попадания сайта в Google и Яндекс.
 
+Короткий чек-лист релиза и сборка архива — в [RELEASE-CHECKLIST.md](RELEASE-CHECKLIST.md).
+
 ## 1. Перед выкладкой
 
 1. Убедитесь, что в `config/config.php`:
    - `app.url` = `https://grand-detailing.ru` (без слэша на конце);
    - `app.debug` = `false`;
    - корректны доступы к боевой БД.
-2. **Сначала примените миграции** `007_service_content.sql` и `008_faqs.sql` (иначе новые поля/таблица ещё не существуют).
+   На сервере можно взять за основу `config/config.production.example.php`.
+2. **Сначала примените миграции** `007_service_content.sql` и `008_faqs.sql` (иначе новые поля/таблица ещё не существуют). Для чистой БД — `database/schema.sql` и миграции `001`–`008`.
 3. Сделайте бэкап файлов и базы (phpMyAdmin → экспорт).
 4. Не перезаписывайте на сервере:
    - `config/config.php`;
    - `storage/sessions/`, `storage/uploads/`;
    - загруженные пользователями файлы.
+5. Соберите и проверьте релиз:
+
+   ```bash
+   php scripts/preflight.php --local
+   php scripts/build-release.php /path/to/release
+   ```
+
+   Архив не содержит `config/config.php`, demo-seed и пользовательские файлы.
 
 ## 2. Что залить
 
@@ -64,6 +75,8 @@ views/admin/service_form.php
 ```
 
 Режим передачи — binary. Сборки нет: `asset()` сам обновит версии CSS/JS по mtime.
+
+Проще залить готовый архив из `scripts/build-release.php`: он содержит рабочие файлы и `config/config.production.example.php`, но не содержит `config/config.php`, demo-seed и пользовательские загрузки.
 
 ## 3. Проверка после выкладки
 
