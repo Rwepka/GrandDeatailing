@@ -38,9 +38,33 @@ php scripts/build-release.php /path/to/release
 008_faqs.sql
 ```
 
+Применять по порядку, **до заливки файлов**. В phpMyAdmin: выбрать БД → вкладка SQL → вставить содержимое файла → выполнить. Через SSH:
+
+```bash
+mysql -u <user> -p <db> < database/migrations/007_service_content.sql
+mysql -u <user> -p <db> < database/migrations/008_faqs.sql
+```
+
+Проверка:
+
+```sql
+SHOW COLUMNS FROM services LIKE 'short_description';
+SHOW TABLES LIKE 'faqs';
+```
+
 Для **чистой** БД: `database/schema.sql`, затем миграции `001`–`008` по порядку. `database/seed.sql` — только демо-данные (категории, услуги, отзывы), на существующем проде его импортировать не нужно; в релизный архив seed не входит.
 
 ## 4. Выкладка
+
+### FTP, существующий сайт
+
+- [ ] Для обновления использовать **только update-архив** с изменёнными/новыми файлами, а не полный релиз.
+- [ ] Не загружать/не перезаписывать `config/config.php`, `public/yandex_*.html`, `storage/sessions`, `storage/uploads`, `public/uploads`.
+- [ ] Не загружать `database/schema.sql` и `database/seed.sql` поверх рабочей БД.
+- [ ] Загружать в **binary**-режиме, сохраняя структуру каталогов.
+- [ ] После загрузки проверить, что старые файлы, которых нет в update-архиве, не удалены.
+
+### Общая выкладка
 
 - [ ] Загрузить архив в релизную директорию, распаковать.
 - [ ] Не перезаписывать `config/config.php`, `storage/sessions`, `storage/uploads`, `public/uploads`.
