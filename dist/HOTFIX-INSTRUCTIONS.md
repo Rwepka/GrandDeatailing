@@ -1,7 +1,7 @@
 # GRAND DETAILING — hotfix последних мелких патчей
 
-**Пакет:** `C:\Users\Rwepka\dev\release\prod-hotfix-d4772b9-20261125-005850.zip`  
-**SHA256:** `7971eea68dee721c3cb135f7d0ae7636293aa5d55d7e94f948ca242a3af2aa81`
+**Пакет:** `C:\Users\Rwepka\dev\release\prod-hotfix-4dbd7e3-20261125-010047.zip`  
+**SHA256:** `08edabe6bb3434692b4bb290dc8043519426ab1ba9c44b45e095e8976eaa8e4f`
 
 Большой патч уже выложен на production. В этом архиве только последние маленькие исправления.
 
@@ -11,8 +11,9 @@
 - `src/Controller/AuthController.php` — администратор после входа попадает в `/admin`.
 - `src/Controller/CabinetController.php` — после смены временного пароля админ тоже попадает в `/admin`;
 - `views/login.php` — стандартная синяя ссылка «Зарегистрироваться»;
-- `views/layout/header.php` и `public/assets/js/main.js` — слой размытия мобильного меню;
-- `public/assets/css/style.css` — glass-панель с параметрами `.admin-sidebar`: `rgba(1,1,1,.45)` + `blur(5px)`, без границы.
+- `views/layout/header.php` — контейнер blur-слоя;
+- `public/assets/css/style.css` — glass-панель с параметрами `.admin-sidebar`: `rgba(1,1,1,.45)` + `blur(5px)`, без границы;
+- `public/assets/js/main.js` — blur-слой включается в том же кадре, без мигания при открытии.
 
 В архиве 6 файлов. **SQL-миграции не нужны.**
 
