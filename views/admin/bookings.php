@@ -16,8 +16,10 @@ $statuses = [
     'cancelled' => 'Отменена',
 ];
 ?>
-<h1>Заявки</h1>
-<a href="<?= e(url('/admin/bookings/create')) ?>" class="btn btn-accent btn-create">Создать заявку</a>
+<div class="admin-page-head">
+    <h1>Заявки</h1>
+    <a href="<?= e(url('/admin/bookings/create')) ?>" class="btn btn-accent">Создать заявку</a>
+</div>
 
 <?php if (!empty($flash)): ?>
     <div class="flash" role="status"><?= e((string) $flash) ?></div>

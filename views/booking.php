@@ -57,9 +57,21 @@ $crumbs = [
             <input type="text" name="website" value="" class="hp-field" tabindex="-1" autocomplete="off" aria-hidden="true">
 
             <ol class="booking-steps">
-                <li data-step="1" class="active"><span>1</span> Автомобиль</li>
-                <li data-step="2"><span>2</span> Услуги</li>
-                <li data-step="3"><span>3</span> Контакт</li>
+                <li data-step="1" class="active">
+                    <button type="button" class="step-link" data-step-target="1">
+                        <span class="step-num">1</span><span class="step-title">Автомобиль</span>
+                    </button>
+                </li>
+                <li data-step="2">
+                    <button type="button" class="step-link" data-step-target="2">
+                        <span class="step-num">2</span><span class="step-title">Услуги</span>
+                    </button>
+                </li>
+                <li data-step="3">
+                    <button type="button" class="step-link" data-step-target="3">
+                        <span class="step-num">3</span><span class="step-title">Контакт</span>
+                    </button>
+                </li>
             </ol>
 
             <!-- Шаг 1: Автомобиль -->
@@ -67,7 +79,7 @@ $crumbs = [
                 <h2>Автомобиль</h2>
                 <fieldset class="field-group"<?= field_aria($errors, 'car_class', 'err-car_class') ?>>
                     <legend>Класс автомобиля</legend>
-                    <div class="option-grid">
+                    <div class="segmented">
                         <?php foreach ($carClasses as $carClass): ?>
                             <label class="option">
                                 <input type="radio" name="car_class" value="<?= e($carClass) ?>" <?= $oldCarClass === $carClass ? 'checked' : '' ?>>
@@ -92,7 +104,7 @@ $crumbs = [
                 <h2>Услуги</h2>
                 <fieldset class="field-group"<?= field_aria($errors, 'service_ids', 'err-service_ids') ?>>
                     <legend class="visually-hidden">Услуги</legend>
-                    <div class="cards">
+                    <div class="cards cards-services">
                     <?php foreach ($services as $service): ?>
                         <div class="card service-card"
                              data-price="<?= e((string) ($service['price_from'] ?? '')) ?>"

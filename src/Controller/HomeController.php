@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Core\View;
+use App\Model\Faq;
 use App\Model\Service;
 use App\Model\ServicePrice;
 
@@ -24,6 +25,7 @@ class HomeController
                 return [
                     'slug' => $s['slug'],
                     'title' => $s['title'],
+                    'short_description' => trim((string) ($s['short_description'] ?? '')),
                     'price' => price($s['price_from'] === null ? null : (float) $s['price_from']),
                 ];
             },
@@ -31,11 +33,13 @@ class HomeController
         );
 
         View::render('home', [
-            'title' => 'GRAND DETAILING — детейлинг-студия',
+            'title' => 'Детейлинг в Туапсе — GRAND DETAILING: полировка, керамика, химчистка',
+            'metaDescription' => 'Детейлинг-студия GRAND DETAILING в Туапсе: мойка, полировка, керамика, плёнка PPF, тонировка и химчистка салона. Онлайн-запись, гарантия.',
             'services' => $services,
             'carClasses' => car_classes(),
             'calculatorServices' => $activeServices,
             'servicePrices' => $servicePrices,
+            'faqs' => Faq::active(),
         ]);
     }
 }

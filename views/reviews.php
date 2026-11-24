@@ -11,8 +11,8 @@ $crumbs = [
 <section class="section">
     <div class="container">
         <?php require BASE_PATH . '/views/partials/breadcrumbs.php'; ?>
-        <h1>Отзывы</h1>
-        <p class="lead">Что говорят о нас клиенты студии.</p>
+        <h1>Отзывы о детейлинге</h1>
+        <p class="lead">Что говорят клиенты GRAND DETAILING: полировка, керамика, химчистка салона и защитная плёнка.</p>
 
         <?php if (empty($reviews)): ?>
             <p>Отзывов пока нет</p>
@@ -51,10 +51,12 @@ if ($reviewCount > 0) {
     $avgRating = round($sum / $reviewCount, 1);
 }
 ?>
+<?php if ($reviewCount > 0): ?>
 <script type="application/ld+json">
 {
     "@context": "https://schema.org",
     "@type": "AutoWash",
+    "@id": "<?= e(rtrim((string) config('app.url'), '/')) ?>/#business",
     "name": "<?= e(config('app.name')) ?>",
     "aggregateRating": {
         "@type": "AggregateRating",
@@ -63,3 +65,4 @@ if ($reviewCount > 0) {
     }
 }
 </script>
+<?php endif; ?>

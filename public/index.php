@@ -31,6 +31,7 @@ use App\Controller\AdminMasterController;
 use App\Controller\AdminClientController;
 use App\Controller\AdminSettingsController;
 use App\Controller\AdminAuditController;
+use App\Controller\AdminFaqController;
 
 $router = new Router();
 
@@ -105,6 +106,13 @@ $router->post('/admin/clients/{id}/delete', [AdminClientController::class, 'dele
 $router->post('/admin/clients/{id}/verify', [AdminClientController::class, 'verify']);
 $router->get('/admin/settings', [AdminSettingsController::class, 'index']);
 $router->post('/admin/settings', [AdminSettingsController::class, 'store']);
+$router->get('/admin/faqs', [AdminFaqController::class, 'index']);
+$router->get('/admin/faqs/create', [AdminFaqController::class, 'create']);
+$router->post('/admin/faqs', [AdminFaqController::class, 'store']);
+$router->get('/admin/faqs/{id}/edit', [AdminFaqController::class, 'edit']);
+$router->post('/admin/faqs/{id}', [AdminFaqController::class, 'update']);
+$router->post('/admin/faqs/{id}/toggle', [AdminFaqController::class, 'toggle']);
+$router->post('/admin/faqs/{id}/delete', [AdminFaqController::class, 'delete']);
 $router->get('/admin/audit', [AdminAuditController::class, 'index']);
 
 // По мере разработки добавляются:

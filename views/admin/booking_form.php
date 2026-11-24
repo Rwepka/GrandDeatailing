@@ -3,14 +3,17 @@
  * Форма создания заявки в админ-панели.
  *
  * @var array<int, array<string, mixed>> $services
+ * @var array<int, array<string, mixed>> $servicePrices
  * @var array<int, string>               $carClasses
  * @var array<int, string>               $errors
  * @var array<string, mixed>             $old
  */
 $services = $services ?? [];
+$servicePrices = $servicePrices ?? [];
 $carClasses = $carClasses ?? [];
 $errors = $errors ?? [];
 $old = $old ?? [];
+$oldServiceIds = array_map('intval', (array) ($old['service_ids'] ?? []));
 ?>
 <div class="card card-plain">
     <h1>Новая заявка</h1>
@@ -26,7 +29,7 @@ $old = $old ?? [];
         </div>
     <?php endif; ?>
 
-    <form method="POST" action="<?= e(url('/admin/bookings')) ?>" novalidate>
+    <form method="POST" action="<?= e(url('/admin/bookings')) ?>" id="admin-booking-form" novalidate>
         <?= csrf_field() ?>
 
         <div class="field-group">
@@ -39,9 +42,9 @@ $old = $old ?? [];
             <input type="tel" name="phone" id="phone" placeholder="+7 900 000-00-00" value="<?= e((string) ($old['phone'] ?? '')) ?>">
         </div>
 
-        <div class="field-group">
-            <label>Класс автомобиля</label>
-            <div class="option-grid">
+        <fieldset class="field-group">
+            <legend>Класс автомобиля</legend>
+            <div class="segmented">
                 <?php foreach ($carClasses as $carClass): ?>
                     <label class="option">
                         <input type="radio" name="car_class" value="<?= e($carClass) ?>" <?= ($old['car_class'] ?? '') === $carClass ? 'checked' : '' ?>>
@@ -49,27 +52,31 @@ $old = $old ?? [];
                     </label>
                 <?php endforeach; ?>
             </div>
-        </div>
+        </fieldset>
 
         <div class="field-group">
             <label for="brand_model">Марка и модель <small>(необязательно)</small></label>
             <input type="text" name="brand_model" id="brand_model" placeholder="BMW X5" value="<?= e((string) ($old['brand_model'] ?? '')) ?>">
         </div>
 
-        <div class="field-group">
-            <label>Услуги</label>
-            <div class="cards">
+        <fieldset class="field-group">
+            <legend>Услуги</legend>
+            <div class="cards cards-services">
                 <?php foreach ($services as $service): ?>
-                    <div class="card service-card">
+                    <div class="card service-card"
+                         data-price="<?= e((string) ($service['price_from'] ?? '')) ?>"
+                         data-prices="<?= e(json_encode($servicePrices[(int) $service['id']] ?? [], JSON_UNESCAPED_UNICODE)) ?>">
                         <label class="service-card-label">
-                            <input type="checkbox" name="service_ids[]" value="<?= e((string) $service['id']) ?>" <?= in_array((int) $service['id'], $old['service_ids'] ?? [], true) ? 'checked' : '' ?>>
+                            <input type="checkbox" name="service_ids[]" value="<?= e((string) $service['id']) ?>" <?= in_array((int) $service['id'], $oldServiceIds, true) ? 'checked' : '' ?>>
                             <span class="service-card-title"><?= e($service['title']) ?></span>
                             <span class="price"><?= e(price($service['price_from'] === null ? null : (float) $service['price_from'])) ?></span>
                         </label>
                     </div>
                 <?php endforeach; ?>
             </div>
-        </div>
+        </fieldset>
+
+        <div class="quiz-total">Итого: <strong id="admin-booking-total">от 0 ₽</strong></div>
 
         <div class="field-group">
             <label for="pref_date">Желаемая дата <small>(необязательно)</small></label>
@@ -86,7 +93,9 @@ $old = $old ?? [];
             <textarea name="comment" id="comment" rows="3" placeholder="Пожелания клиента"><?= e((string) ($old['comment'] ?? '')) ?></textarea>
         </div>
 
-        <button type="submit" class="btn btn-accent">Создать</button>
-        <a href="<?= e(url('/admin/bookings')) ?>" class="btn btn-outline">Отмена</a>
+        <div class="form-actions">
+            <button type="submit" class="btn btn-accent">Создать</button>
+            <a href="<?= e(url('/admin/bookings')) ?>" class="btn btn-outline">Отмена</a>
+        </div>
     </form>
 </div>

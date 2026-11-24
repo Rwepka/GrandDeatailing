@@ -19,14 +19,16 @@ class AdminSettingsController
      */
     private const SETTINGS = [
         'address'    => ['label' => 'Адрес',             'default' => 'г. Туапсе, ул. Богдана Хмельницкого, 16'],
-        'phone'      => ['label' => 'Телефон',           'default' => '+7 (988) 413-07-77'],
-        'work_hours' => ['label' => 'Режим работы',      'default' => 'Ежедневно с 9:00 до 20:00'],
+        'phone'      => ['label' => 'Телефон',           'default' => '+7 (988) 413-57-77'],
+        'work_hours' => ['label' => 'Режим работы',      'default' => 'Ежедневно с 10:00 до 19:00'],
         'email'      => ['label' => 'Email',             'default' => ''],
         'telegram'   => ['label' => 'Telegram (ссылка)', 'default' => ''],
         'whatsapp'   => ['label' => 'WhatsApp (ссылка)', 'default' => ''],
         'vk'         => ['label' => 'VK (ссылка)',       'default' => ''],
         'map_lat'    => ['label' => 'Широта карты',      'default' => '44.104854'],
         'map_lng'    => ['label' => 'Долгота карты',     'default' => '39.087091'],
+        'google_verification' => ['label' => 'Google Search Console (код подтверждения)', 'default' => ''],
+        'yandex_verification' => ['label' => 'Яндекс.Вебмастер (код подтверждения)', 'default' => ''],
     ];
 
     public function index(): void

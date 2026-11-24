@@ -43,6 +43,7 @@ $old = $old ?? [];
                 <div class="field-group">
                     <label class="checkbox-label">
                         <input type="checkbox" name="remember" value="1">
+                        <span class="checkbox-ui" aria-hidden="true"></span>
                         Запомнить меня
                     </label>
                 </div>

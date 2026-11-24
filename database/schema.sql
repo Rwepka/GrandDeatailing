@@ -85,6 +85,10 @@ CREATE TABLE services (
     category_id   INT UNSIGNED      NOT NULL,
     title         VARCHAR(140)      NOT NULL,
     slug          VARCHAR(160)      NOT NULL,
+    short_description VARCHAR(255)  NULL,
+    description   TEXT              NULL,
+    includes      TEXT              NULL,
+    process       TEXT              NULL,
     price_from    DECIMAL(10, 2)    NULL,
     duration_min  INT UNSIGNED      NULL,
     image         VARCHAR(255)      NULL,
@@ -328,6 +332,23 @@ CREATE TABLE audit_log (
   COMMENT = 'Журнал действий (аудит)';
 
 SET FOREIGN_KEY_CHECKS = 1;
+
+-- ---------------------------------------------------------------------
+-- Вопросы и ответы для блока на главной
+-- ---------------------------------------------------------------------
+CREATE TABLE faqs (
+    id         INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    question   VARCHAR(255) NOT NULL,
+    answer     TEXT         NOT NULL,
+    sort_order INT          NOT NULL DEFAULT 0,
+    is_active  TINYINT(1)   NOT NULL DEFAULT 1,
+    created_at DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    KEY idx_faqs_active (is_active, sort_order)
+) ENGINE = InnoDB
+  DEFAULT CHARACTER SET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci
+  COMMENT = 'Вопросы и ответы для блока на главной';
 
 -- ---------------------------------------------------------------------
 -- Настройки сайта (ключ → значение)

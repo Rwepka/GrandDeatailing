@@ -22,15 +22,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Шаг валиден, только когда выбраны его обязательные поля:
         // шаг 1 — класс автомобиля; шаг 2 — хотя бы одна услуга.
-        const isCurrentStepValid = () => {
-            if (current === 0) {
+        const isStepValid = (index) => {
+            if (index === 0) {
                 return form.querySelector('input[name="car_class"]:checked') !== null;
             }
-            if (current === 1) {
+            if (index === 1) {
                 return form.querySelectorAll('input[name="service_ids[]"]:checked').length > 0;
             }
             return true;
         };
+
+        const isCurrentStepValid = () => isStepValid(current);
 
         const updateNextButton = () => {
             const nextBtn = steps[current].querySelector('[data-next]');
@@ -39,12 +41,32 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         };
 
+        // Вперёд можно идти только по заполненным шагам, назад — всегда.
+        const canNavigateTo = (target) => {
+            if (target <= current) {
+                return true;
+            }
+            for (let i = current; i < target; i += 1) {
+                if (!isStepValid(i)) {
+                    return false;
+                }
+            }
+            return true;
+        };
+
         const show = (index, focusStep = false) => {
             steps.forEach((step, i) => { step.hidden = i !== index; });
             indicators.forEach((li, i) => {
                 li.classList.toggle('active', i === index);
                 li.classList.toggle('done', i < index);
-                if (i === index) {
+                const button = li.querySelector('[data-step-target]');
+                if (button) {
+                    if (i === index) {
+                        button.setAttribute('aria-current', 'step');
+                    } else {
+                        button.removeAttribute('aria-current');
+                    }
+                } else if (i === index) {
                     li.setAttribute('aria-current', 'step');
                 } else {
                     li.removeAttribute('aria-current');
@@ -63,6 +85,16 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         form.addEventListener('click', (e) => {
+            const stepLink = e.target.closest('[data-step-target]');
+            if (stepLink) {
+                e.preventDefault();
+                const target = parseInt(stepLink.getAttribute('data-step-target'), 10) - 1;
+                if (Number.isInteger(target) && target >= 0 && target < steps.length && canNavigateTo(target)) {
+                    show(target, true);
+                }
+                return;
+            }
+
             const btn = e.target.closest('[data-next], [data-prev]');
             if (!btn) return;
             e.preventDefault();
@@ -260,47 +292,23 @@ document.addEventListener('DOMContentLoaded', () => {
         requestAnimationFrame(tick);
     };
 
-    // Калькулятор стоимости на главной странице.
-    const calcTotal = document.getElementById('calc-total');
-    if (calcTotal) {
-        const calcServices = Array.from(document.querySelectorAll('input[name="service_ids[]"]'));
-        const calcCarClasses = Array.from(document.querySelectorAll('input[name="car_class"]'));
+    // Пересчёт цен по выбранному классу кузова.
+    // Работает и в калькуляторе на главной, и в квизе записи, и в админ-форме.
+    const initPriceScope = (scope, totalEl) => {
+        const cards = Array.from(scope.querySelectorAll('.service-card[data-prices], .calculator-service'));
+        const carInputs = Array.from(scope.querySelectorAll('input[name="car_class"]'));
 
         const recalc = () => {
-            const carClassRadio = document.querySelector('input[name="car_class"]:checked');
-            const carClass = carClassRadio ? carClassRadio.value : '';
-
-            const sum = calcServices.reduce((acc, cb) => {
-                if (!cb.checked) return acc;
-                const price = priceForClass(cb.dataset.price, cb.dataset.prices, carClass);
-                return price === null ? acc : acc + price;
-            }, 0);
-
-            animatePrice(calcTotal, sum);
-        };
-
-        calcServices.forEach((cb) => cb.addEventListener('change', recalc));
-        calcCarClasses.forEach((radio) => radio.addEventListener('change', recalc));
-        recalc();
-    }
-
-    // Цены по кузову и итог в шаге 2 квиза записи.
-    const bookingForm = document.getElementById('booking-form');
-    const quizTotal = document.getElementById('quiz-total');
-    if (bookingForm && quizTotal) {
-        const quizCards = Array.from(bookingForm.querySelectorAll('.service-card'));
-        const quizCarClasses = Array.from(bookingForm.querySelectorAll('input[name="car_class"]'));
-        const quizServices = Array.from(bookingForm.querySelectorAll('input[name="service_ids[]"]'));
-
-        const updateQuizPrices = () => {
-            const carClassRadio = bookingForm.querySelector('input[name="car_class"]:checked');
+            const carClassRadio = scope.querySelector('input[name="car_class"]:checked');
             const carClass = carClassRadio ? carClassRadio.value : '';
 
             let sum = 0;
-            quizCards.forEach((card) => {
+            cards.forEach((card) => {
                 const cb = card.querySelector('input[name="service_ids[]"]');
+                // Цены могут лежать на самой карточке или на её чекбоксе.
+                const priceNode = card.dataset.prices !== undefined ? card : cb;
+                const price = priceForClass(priceNode?.dataset.price, priceNode?.dataset.prices, carClass);
                 const priceEl = card.querySelector('.price');
-                const price = priceForClass(card.dataset.price, card.dataset.prices, carClass);
                 if (priceEl) {
                     priceEl.textContent = price === null ? 'цена по запросу' : formatRoubles(price);
                 }
@@ -309,12 +317,39 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
-            animatePrice(quizTotal, sum);
+            if (totalEl) {
+                animatePrice(totalEl, sum);
+            }
         };
 
-        quizCarClasses.forEach((radio) => radio.addEventListener('change', updateQuizPrices));
-        quizServices.forEach((cb) => cb.addEventListener('change', updateQuizPrices));
-        updateQuizPrices();
+        carInputs.forEach((input) => input.addEventListener('change', recalc));
+        cards.forEach((card) => {
+            const cb = card.querySelector('input[name="service_ids[]"]');
+            if (cb) {
+                cb.addEventListener('change', recalc);
+            }
+        });
+        recalc();
+    };
+
+    const calcTotal = document.getElementById('calc-total');
+    if (calcTotal) {
+        const calcForm = calcTotal.closest('form');
+        if (calcForm) {
+            initPriceScope(calcForm, calcTotal);
+        }
+    }
+
+    const bookingForm = document.getElementById('booking-form');
+    const quizTotal = document.getElementById('quiz-total');
+    if (bookingForm && quizTotal) {
+        initPriceScope(bookingForm, quizTotal);
+    }
+
+    const adminBookingForm = document.getElementById('admin-booking-form');
+    const adminBookingTotal = document.getElementById('admin-booking-total');
+    if (adminBookingForm && adminBookingTotal) {
+        initPriceScope(adminBookingForm, adminBookingTotal);
     }
 
     // Маска телефона: +7 (XXX) XXX-XX-XX для всех полей type="tel".

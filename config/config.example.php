@@ -18,7 +18,7 @@ return [
         'force_https' => false,
     ],
     'db' => [
-        'host' => 'localhost',
+        'host' => '127.0.0.1', // на Windows-локально без IPv6-таймаута; на Linux-хостинге допустим localhost
         'port' => '3306',
         'name' => 'grand_detailing',
         'user' => 'db_user',

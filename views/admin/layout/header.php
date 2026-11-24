@@ -14,6 +14,7 @@ $current = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/';
     <link rel="apple-touch-icon" href="<?= e(url('/apple-touch-icon.png')) ?>">
     <link rel="manifest" href="<?= e(url('/site.webmanifest')) ?>">
     <meta name="theme-color" content="#5e5c64">
+    <meta name="robots" content="noindex, nofollow">
     <link rel="stylesheet" href="<?= e(asset('css/style.css')) ?>">
     <link rel="stylesheet" href="<?= e(asset('css/admin.css')) ?>">
     <script src="<?= e(asset('js/admin.js')) ?>" defer></script>
@@ -27,10 +28,6 @@ $current = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/';
     <div class="admin-overlay" id="admin-overlay" hidden></div>
     <aside class="admin-sidebar" id="admin-sidebar">
         <nav class="admin-nav" aria-label="Меню админ-панели">
-            <a href="<?= e(url('/')) ?>">
-                <svg class="admin-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 11 9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
-                <span class="admin-nav-label">Главная</span>
-            </a>
             <?php if (isMaster()): ?>
                 <a href="<?= e(url('/admin/bookings')) ?>"<?= nav_attrs(str_starts_with($current, '/admin/bookings')) ?>>
                     <svg class="admin-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>
@@ -60,6 +57,10 @@ $current = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/';
                 <a href="<?= e(url('/admin/reviews')) ?>"<?= nav_attrs(str_starts_with($current, '/admin/reviews')) ?>>
                     <svg class="admin-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.9 6 6.1.9-4.5 4.3 1 6.1L12 17l-5.5 3.3 1-6.1L3 10l6.1-.9z"/></svg>
                     <span class="admin-nav-label">Отзывы</span>
+                </a>
+                <a href="<?= e(url('/admin/faqs')) ?>"<?= nav_attrs(str_starts_with($current, '/admin/faqs')) ?>>
+                    <svg class="admin-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.1 9a3 3 0 1 1 4.4 2.7c-.9.5-1.5 1.2-1.5 2.3"/><path d="M12 17h.01"/></svg>
+                    <span class="admin-nav-label">Вопросы</span>
                 </a>
                 <a href="<?= e(url('/admin/posts')) ?>"<?= nav_attrs(str_starts_with($current, '/admin/posts')) ?>>
                     <svg class="admin-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 9h10M7 13h10M7 17h6"/></svg>

@@ -132,7 +132,7 @@ class AdminServiceController
             return;
         }
 
-        $result = $this->validate($categories);
+        $result = $this->validate($categories, $id);
 
         if ($result['errors'] !== []) {
             View::renderAdmin('service_form', [
@@ -186,6 +186,11 @@ class AdminServiceController
         return [
             'title' => trim((string) ($_POST['title'] ?? '')),
             'slug' => trim((string) ($_POST['slug'] ?? '')),
+            'short_description' => trim((string) ($_POST['short_description'] ?? '')),
+            'description' => trim((string) ($_POST['description'] ?? '')),
+            'includes' => trim((string) ($_POST['includes'] ?? '')),
+            'process' => trim((string) ($_POST['process'] ?? '')),
+            'price_from' => trim((string) ($_POST['price_from'] ?? '')),
             'duration_min' => trim((string) ($_POST['duration_min'] ?? '')),
             'category_id' => trim((string) ($_POST['category_id'] ?? '')),
             'prices' => $prices,
@@ -196,9 +201,10 @@ class AdminServiceController
      * Валидация формы услуги (общая для create/update).
      *
      * @param array<int, array<string, mixed>> $categories
+     * @param int|null $ignoreId id услуги, которую не учитываем при проверке slug
      * @return array{data: array<string, mixed>, prices: array<string, float|null>, errors: array<int, string>}
      */
-    private function validate(array $categories): array
+    private function validate(array $categories, ?int $ignoreId = null): array
     {
         $errors = [];
 
@@ -220,6 +226,30 @@ class AdminServiceController
             $errors[] = 'Slug не должен быть длиннее 160 символов.';
         } elseif (preg_match('/^[a-z0-9-]+$/', $slug) !== 1) {
             $errors[] = 'Slug может содержать только латиницу, цифры и дефис.';
+        } elseif (Service::slugExists($slug, $ignoreId)) {
+            $errors[] = 'Услуга с таким slug уже существует.';
+        }
+
+        // --- Краткое и полное описание ---
+        $shortDescription = trim((string) ($_POST['short_description'] ?? ''));
+        $shortLen = function_exists('mb_strlen') ? mb_strlen($shortDescription) : strlen($shortDescription);
+        if ($shortLen > 255) {
+            $errors[] = 'Краткое описание не должно быть длиннее 255 символов.';
+        }
+
+        $description = trim((string) ($_POST['description'] ?? ''));
+        $descriptionLen = function_exists('mb_strlen') ? mb_strlen($description) : strlen($description);
+        if ($descriptionLen > 10000) {
+            $errors[] = 'Полное описание слишком длинное (максимум 10 000 символов).';
+        }
+
+        $includes = trim((string) ($_POST['includes'] ?? ''));
+        $process = trim((string) ($_POST['process'] ?? ''));
+        foreach (['Что входит' => $includes, 'Как проходит работа' => $process] as $label => $value) {
+            $valueLen = function_exists('mb_strlen') ? mb_strlen($value) : strlen($value);
+            if ($valueLen > 10000) {
+                $errors[] = $label . ': максимум 10 000 символов.';
+            }
         }
 
         // --- Длительность (необязательно, целое число) ---
@@ -269,6 +299,19 @@ class AdminServiceController
             }
         }
 
+        // --- Базовая «цена от» (используется, если цены по кузовам не заданы) ---
+        $basePrice = null;
+        $basePriceRaw = trim((string) ($_POST['price_from'] ?? ''));
+        if ($basePriceRaw !== '') {
+            if (filter_var($basePriceRaw, FILTER_VALIDATE_FLOAT) === false) {
+                $errors[] = 'Цена «от» должна быть числом.';
+            } elseif ((float) $basePriceRaw < 0) {
+                $errors[] = 'Цена «от» не может быть отрицательной.';
+            } else {
+                $basePrice = (float) $basePriceRaw;
+            }
+        }
+
         // --- «Цена от» = минимальная из цен по кузовам ---
         $priceFrom = null;
         foreach ($prices as $price) {
@@ -276,12 +319,19 @@ class AdminServiceController
                 $priceFrom = $price;
             }
         }
+        if ($priceFrom === null) {
+            $priceFrom = $basePrice;
+        }
 
         return [
             'data' => [
                 'category_id' => $categoryId,
                 'title' => $title,
                 'slug' => $slug,
+                'short_description' => $shortDescription !== '' ? $shortDescription : null,
+                'description' => $description !== '' ? $description : null,
+                'includes' => $includes !== '' ? $includes : null,
+                'process' => $process !== '' ? $process : null,
                 'price_from' => $priceFrom,
                 'duration_min' => $durationMin,
                 'image' => null,

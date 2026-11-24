@@ -14,7 +14,8 @@ class ContactController
         // Точка отсчёта для time-trap: замер времени заполнения формы.
         $_SESSION['contact_form_time'] = time();
         View::render('contacts', [
-            'title' => 'Контакты',
+            'title' => 'Контакты детейлинг-студии в Туапсе — GRAND DETAILING',
+            'metaDescription' => 'Адрес детейлинг-студии GRAND DETAILING в Туапсе: ул. Богдана Хмельницкого, 16. Телефон, режим работы, карта и форма обратной связи.',
             'errors' => [],
             'old' => [],
             'flash' => flash(),
@@ -38,7 +39,8 @@ class ContactController
         $ip = (string) ($_SERVER['REMOTE_ADDR'] ?? '0.0.0.0');
         if (RateLimit::tooMany($ip)) {
             View::render('contacts', [
-                'title' => 'Контакты',
+                'title' => 'Контакты детейлинг-студии в Туапсе — GRAND DETAILING',
+            'metaDescription' => 'Адрес детейлинг-студии GRAND DETAILING в Туапсе: ул. Богдана Хмельницкого, 16. Телефон, режим работы, карта и форма обратной связи.',
                 'errors' => ['Слишком много сообщений. Попробуйте позже.'],
                 'old' => [],
                 'flash' => null,
@@ -58,7 +60,8 @@ class ContactController
         if (!csrf_verify($_POST['csrf_token'] ?? null)) {
             http_response_code(419);
             View::render('contacts', [
-                'title' => 'Контакты',
+                'title' => 'Контакты детейлинг-студии в Туапсе — GRAND DETAILING',
+            'metaDescription' => 'Адрес детейлинг-студии GRAND DETAILING в Туапсе: ул. Богдана Хмельницкого, 16. Телефон, режим работы, карта и форма обратной связи.',
                 'errors' => ['Сессия устарела. Обновите страницу и попробуйте ещё раз.'],
                 'old' => $old,
                 'flash' => null,
@@ -106,7 +109,8 @@ class ContactController
 
         if ($errors !== []) {
             View::render('contacts', [
-                'title' => 'Контакты',
+                'title' => 'Контакты детейлинг-студии в Туапсе — GRAND DETAILING',
+            'metaDescription' => 'Адрес детейлинг-студии GRAND DETAILING в Туапсе: ул. Богдана Хмельницкого, 16. Телефон, режим работы, карта и форма обратной связи.',
                 'errors' => $errors,
                 'old' => $old,
                 'flash' => null,

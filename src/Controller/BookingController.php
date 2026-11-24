@@ -41,7 +41,8 @@ class BookingController
         $servicePrices = ServicePrice::mapForServices(array_column($services, 'id'));
 
         View::render('booking', [
-            'title' => 'Запись онлайн',
+            'title' => 'Запись онлайн — детейлинг в Туапсе | GRAND DETAILING',
+            'metaDescription' => 'Запишитесь в детейлинг-студию GRAND DETAILING в Туапсе: выберите класс автомобиля и услуги, оставьте телефон — перезвоним и подтвердим время.',
             'services' => $services,
             'servicePrices' => $servicePrices,
             'carClasses' => self::CAR_CLASSES,
@@ -65,6 +66,7 @@ class BookingController
         }
 
         $services = Service::active();
+        $servicePrices = ServicePrice::mapForServices(array_column($services, 'id'));
 
         // Исходные значения для повторного заполнения формы при ошибках.
         $old = [
@@ -86,8 +88,10 @@ class BookingController
         if ($formTime === 0 || (time() - $formTime) < 3) {
             $_SESSION['booking_form_time'] = time();
             View::render('booking', [
-                'title' => 'Запись онлайн',
+                'title' => 'Запись онлайн — детейлинг в Туапсе | GRAND DETAILING',
+                'metaDescription' => 'Запишитесь в детейлинг-студию GRAND DETAILING в Туапсе: выберите класс автомобиля и услуги, оставьте телефон — перезвоним и подтвердим время.',
                 'services' => $services,
+                'servicePrices' => $servicePrices,
                 'carClasses' => self::CAR_CLASSES,
                 'errors' => ['Форма устарела или заполнена слишком быстро. Проверьте данные и отправьте заявку ещё раз.'],
                 'old' => $old,
@@ -99,8 +103,10 @@ class BookingController
         $ip = (string) ($_SERVER['REMOTE_ADDR'] ?? '0.0.0.0');
         if (RateLimit::tooMany($ip)) {
             View::render('booking', [
-                'title' => 'Запись онлайн',
+                'title' => 'Запись онлайн — детейлинг в Туапсе | GRAND DETAILING',
+                'metaDescription' => 'Запишитесь в детейлинг-студию GRAND DETAILING в Туапсе: выберите класс автомобиля и услуги, оставьте телефон — перезвоним и подтвердим время.',
                 'services' => $services,
+                'servicePrices' => $servicePrices,
                 'carClasses' => self::CAR_CLASSES,
                 'errors' => ['Слишком много заявок. Попробуйте позже.'],
                 'old' => $old,
@@ -112,8 +118,10 @@ class BookingController
         if (!csrf_verify($_POST['csrf_token'] ?? null)) {
             http_response_code(419);
             View::render('booking', [
-                'title' => 'Запись онлайн',
+                'title' => 'Запись онлайн — детейлинг в Туапсе | GRAND DETAILING',
+                'metaDescription' => 'Запишитесь в детейлинг-студию GRAND DETAILING в Туапсе: выберите класс автомобиля и услуги, оставьте телефон — перезвоним и подтвердим время.',
                 'services' => $services,
+                'servicePrices' => $servicePrices,
                 'carClasses' => self::CAR_CLASSES,
                 'errors' => ['Сессия устарела. Обновите страницу и попробуйте ещё раз.'],
                 'old' => $old,
@@ -222,8 +230,10 @@ class BookingController
 
         if ($errors !== []) {
             View::render('booking', [
-                'title' => 'Запись онлайн',
+                'title' => 'Запись онлайн — детейлинг в Туапсе | GRAND DETAILING',
+                'metaDescription' => 'Запишитесь в детейлинг-студию GRAND DETAILING в Туапсе: выберите класс автомобиля и услуги, оставьте телефон — перезвоним и подтвердим время.',
                 'services' => $services,
+                'servicePrices' => $servicePrices,
                 'carClasses' => self::CAR_CLASSES,
                 'errors' => $errors,
                 'old' => $old,
@@ -231,7 +241,7 @@ class BookingController
             return;
         }
 
-        $pricesMap = ServicePrice::mapForServices(array_keys($serviceIds));
+        $pricesMap = $servicePrices;
 
         $pdo = Database::connection();
         try {
@@ -266,8 +276,10 @@ class BookingController
                 $pdo->rollBack();
             }
             View::render('booking', [
-                'title' => 'Запись онлайн',
+                'title' => 'Запись онлайн — детейлинг в Туапсе | GRAND DETAILING',
+                'metaDescription' => 'Запишитесь в детейлинг-студию GRAND DETAILING в Туапсе: выберите класс автомобиля и услуги, оставьте телефон — перезвоним и подтвердим время.',
                 'services' => $services,
+                'servicePrices' => $servicePrices,
                 'carClasses' => self::CAR_CLASSES,
                 'errors' => ['Не удалось сохранить заявку. Попробуйте ещё раз позже.'],
                 'old' => $old,

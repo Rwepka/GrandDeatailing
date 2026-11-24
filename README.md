@@ -6,6 +6,8 @@
 
 **Архитектура:** единая точка входа `public/index.php` (фронт-контроллер) → `src/Core/Router` → контроллер (`src/Controller`) → модель (`src/Model`) → представление (`views`).
 
+**Документация:** [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — архитектура и стандарты; [TZ.md](TZ.md) — техническое задание; [docs/QA-REPORT.md](docs/QA-REPORT.md) — проверки; [docs/SEO-DEPLOY.md](docs/SEO-DEPLOY.md) — выкладка и индексация.
+
 ---
 
 ## 1. Требования
@@ -90,6 +92,8 @@ mysql -u <user> -p <db> < database/migrations/003_verified_at.sql
 mysql -u <user> -p <db> < database/migrations/004_login_attempts.sql
 mysql -u <user> -p <db> < database/migrations/005_audit_log.sql
 mysql -u <user> -p <db> < database/migrations/006_booking_master.sql
+mysql -u <user> -p <db> < database/migrations/007_service_content.sql
+mysql -u <user> -p <db> < database/migrations/008_faqs.sql
 ```
 
 Все миграции идемпотентны (повторный запуск безопасен).
@@ -155,7 +159,7 @@ site/
 │   └── Model/              # User, Booking, Service, ServicePrice, LoginAttempt, AuditLog, Setting, …
 ├── views/                  # layout, admin, cabinet, публичные страницы
 ├── config/                 # config.php (не коммитится) + config.example.php
-├── database/               # schema.sql, seed.sql, migrations/002–006
+├── database/               # schema.sql, seed.sql, migrations/001–008
 ├── scripts/                # cleanup_unverified_clients.php (cron)
 ├── storage/                # sessions/, uploads/ (вне веб-корня)
 ├── router.php              # router для встроенного сервера PHP (php -S)

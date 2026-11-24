@@ -110,11 +110,7 @@
 /* KPI-карточки */
 .admin-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-bottom: 28px; }
 .admin-kpi {
-    background-color: #7e8891;
-    background-image:
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E"),
-        linear-gradient(135deg, #505761 0%, #7e8891 15%, #a8b0b9 50%, #7e8891 85%, #505761 100%);
-    background-size: 160px 160px, auto;
+    background: #7e8891;
     border: 1px solid #7e8891;
     border-radius: var(--radius);
     padding: 20px;
@@ -208,11 +204,7 @@
 .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); display: flex; align-items: center; justify-content: center; z-index: 1000; }
 .modal-overlay[hidden] { display: none; }
 .modal {
-    background-color: #7e8891;
-    background-image:
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E"),
-        linear-gradient(135deg, #505761 0%, #7e8891 15%, #a8b0b9 50%, #7e8891 85%, #505761 100%);
-    background-size: 160px 160px, auto;
+    background: #7e8891;
     color: var(--text);
     border-radius: 12px;
     padding: 24px;
@@ -278,3 +270,184 @@
    .card-plain прозрачна на тёмном фоне — там оставляем светлый текст. */
 .admin-main .card:not(.card-plain) .field-group label { color: var(--text); }
 .admin-main .card:not(.card-plain) .field-group small { color: #4B5563; }
+
+/* --- Дизайн-система v2: админ-панель --- */
+.admin-kpi {
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    box-shadow: none;
+}
+.admin-kpi .label { color: rgba(15, 23, 42, 0.8); }
+.modal { border: 1px solid rgba(255, 255, 255, 0.55); }
+.admin-main .card:not(.card-plain) .field-group label { color: #0F172A; }
+.admin-main .card:not(.card-plain) .field-group small { color: rgba(15, 23, 42, 0.75); }
+.admin-main .service-card { min-height: 84px; }
+
+/* Скрытые radio в модалке назначения мастера */
+.assign-option {
+    position: relative;
+    padding: 10px 14px;
+    border: 1px solid rgba(15, 23, 42, 0.25);
+    border-radius: 8px;
+    background: #fff;
+    color: #111827;
+    cursor: pointer;
+}
+.assign-option input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.assign-option:has(input:checked) {
+    background: #F1F5F9;
+    border-color: #111827;
+    box-shadow: inset 0 0 0 1px #111827;
+}
+.assign-option:has(input:focus-visible) {
+    outline: 2px solid #1D4ED8;
+    outline-offset: 2px;
+}
+
+/* Админ-контент занимает всю доступную ширину, формы — читаемая колонка */
+.admin-main { flex: 1 1 auto; min-width: 0; }
+.admin-main form { max-width: 760px; }
+.admin-main .cards { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+
+/* Развёрнутое меню админки сдвигает контент, а не перекрывает его */
+@media (min-width: 821px) {
+    .admin-main { transition: margin-left 200ms cubic-bezier(0.2, 0, 0, 1); }
+    .admin-sidebar.expanded ~ .admin-main { margin-left: 240px; }
+}
+
+/* Заголовок раздела админки и подсказки */
+.admin-page-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+.admin-page-head h1 { margin-bottom: 0; }
+.admin-hint { margin-bottom: 16px; color: #94A3B8; }
+
+/* Заголовки на сатиновых карточках админки — тёмные */
+.admin-main .card:not(.card-plain) h1,
+.admin-main .card:not(.card-plain) h2 { color: #0F172A; }
+
+/* ============================================================
+   Стандарты админ-панели v2: формы, таблицы, отзывы
+   ============================================================ */
+
+/* Формы в админке: тёмная подложка по размеру полей, а не на всю страницу */
+.admin-main > .card:not(.card-plain) {
+    max-width: 820px;
+    background: #1f2330;
+    border: 1px solid #3a4150;
+    border-radius: 12px;
+    color: #f1f5f9;
+    padding: 24px;
+}
+.admin-main > .card:not(.card-plain) h1,
+.admin-main > .card:not(.card-plain) h2 { color: #fff; }
+.admin-main > .card:not(.card-plain) .field-group label,
+.admin-main > .card:not(.card-plain) legend { color: #e5e7eb; }
+.admin-main > .card:not(.card-plain) .field-group small { color: #94a3b8; }
+.admin-main > .card:not(.card-plain) .fieldset { border-color: #3a4150; }
+
+/* Единые размеры элементов в таблицах */
+.admin-table th,
+.admin-table td { padding: 12px 14px; vertical-align: middle; }
+.admin-table .actions { white-space: nowrap; }
+.admin-table .actions .inline-form {
+    display: inline-flex;
+    align-items: center;
+    vertical-align: middle;
+    margin: 0 6px 0 0;
+}
+.admin-table .actions .inline-form:last-child { margin-right: 0; }
+.admin-table select {
+    height: 36px;
+    padding: 0 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #fff;
+    color: #111827;
+    font: inherit;
+    font-size: 13px;
+    vertical-align: middle;
+}
+.admin-table .btn-sm,
+.master-cell .btn-sm {
+    min-height: 36px;
+    padding: 0 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.2;
+    vertical-align: middle;
+}
+.admin-table .badge {
+    display: inline-flex;
+    align-items: center;
+    min-height: 26px;
+    padding: 4px 10px;
+    line-height: 1;
+}
+.master-cell { gap: 8px; align-items: center; }
+.master-cell .master-name { min-width: 90px; color: #e5e7eb; }
+
+/* Модалки в едином тёмном стиле */
+.modal {
+    background: #1f2330;
+    border: 1px solid #3a4150;
+    color: #f1f5f9;
+}
+.modal h2 { color: #fff; }
+.modal-changes li { border-color: #3a4150; color: #e5e7eb; }
+
+/* Отзывы: читаемый текст на тёмном фоне */
+.admin-main .review-item {
+    background: #1f2330;
+    border: 1px solid #3a4150;
+    border-radius: 10px;
+    padding: 14px 16px;
+}
+.admin-main .review-item summary {
+    align-items: center;
+    gap: 10px;
+    color: #f1f5f9;
+}
+.admin-main .review-client { color: #fff; font-weight: 700; }
+.admin-main .review-service { color: #cbd5e1; }
+.admin-main .review-date { color: #94a3b8; font-size: 13px; }
+.admin-main .review-text { color: #e5e7eb; }
+.admin-main .review-note { color: #94a3b8; }
+.admin-main .review-item summary::marker { color: #94a3b8; }
+
+/* Действия в таблицах переносятся, а не обрезаются на узких экранах */
+.admin-table .actions { white-space: normal; max-width: 380px; }
+.admin-table .actions .inline-form { margin: 0 6px 6px 0; }
+.admin-table .actions .inline-form:last-child { margin-bottom: 0; }
+.master-cell { flex-wrap: wrap; white-space: normal; }
+
+/* Мастер: имя и кнопки — в одну строку */
+.master-cell { flex-wrap: nowrap; white-space: nowrap; }
+.master-cell .master-name { min-width: 0; }
+
+/* FAQ-таблица: компактные служебные колонки, вопрос забирает остаток ширины */
+.faq-table {
+    width: 100%;
+    max-width: 1280px;
+    table-layout: auto;
+}
+.faq-table th:nth-child(2),
+.faq-table td:nth-child(2) {
+    width: 90px;
+    text-align: center;
+}
+.faq-table th:nth-child(3),
+.faq-table td:nth-child(3) {
+    width: 140px;
+    text-align: center;
+}
+.faq-table th:nth-child(4),
+.faq-table td:nth-child(4) {
+    width: 340px;
+}
+.faq-table td.actions { max-width: none; width: 340px; white-space: nowrap; }
+.faq-table td.actions .inline-form { margin-bottom: 0; }

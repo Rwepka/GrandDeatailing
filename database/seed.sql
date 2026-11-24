@@ -18,13 +18,13 @@ INSERT IGNORE INTO categories (title, slug) VALUES
     ('Комплексные программы', 'kompleks');
 
 -- Услуги (category_id подставляется через подзапрос по slug)
-INSERT IGNORE INTO services (title, slug, price_from, duration_min, category_id) VALUES
-    ('Мойка', 'moyka', 1000.00, 60, (SELECT id FROM categories WHERE slug = 'deteyling-kuzova')),
-    ('Полировка кузова', 'polirovka-kuzova', 8000.00, 360, (SELECT id FROM categories WHERE slug = 'deteyling-kuzova')),
-    ('Керамика / кварц', 'keramika-kvarc', 18000.00, 480, (SELECT id FROM categories WHERE slug = 'deteyling-kuzova')),
-    ('Оклейка PPF', 'okleyka-ppf', 85000.00, 720, (SELECT id FROM categories WHERE slug = 'deteyling-kuzova')),
-    ('Химчистка салона', 'himchistka-salona', 9000.00, 240, (SELECT id FROM categories WHERE slug = 'deteyling-salona')),
-    ('Комплекс «под ключ»', 'kompleks-pod-klyuch', 45000.00, 720, (SELECT id FROM categories WHERE slug = 'kompleks'));
+INSERT IGNORE INTO services (title, slug, short_description, price_from, duration_min, category_id) VALUES
+    ('Мойка', 'moyka', 'Бережная ручная мойка кузова и колёс с безопасной химией.', 1000.00, 60, (SELECT id FROM categories WHERE slug = 'deteyling-kuzova')),
+    ('Полировка кузова', 'polirovka-kuzova', 'Убираем мелкие царапины и возвращаем глубину цвета ЛКП.', 8000.00, 360, (SELECT id FROM categories WHERE slug = 'deteyling-kuzova')),
+    ('Керамика / кварц', 'keramika-kvarc', 'Керамическое покрытие защищает кузов и упрощает уход.', 18000.00, 480, (SELECT id FROM categories WHERE slug = 'deteyling-kuzova')),
+    ('Оклейка PPF', 'okleyka-ppf', 'Защитная плёнка от сколов, песка и дорожной химии.', 85000.00, 720, (SELECT id FROM categories WHERE slug = 'deteyling-kuzova')),
+    ('Химчистка салона', 'himchistka-salona', 'Глубокая чистка салона, устранение пятен и запахов.', 9000.00, 240, (SELECT id FROM categories WHERE slug = 'deteyling-salona')),
+    ('Комплекс «под ключ»', 'kompleks-pod-klyuch', 'Комплекс работ по кузову и салону под ключ.', 45000.00, 720, (SELECT id FROM categories WHERE slug = 'kompleks'));
 
 -- =====================================================================
 -- Отзывы (демонстрационные, можно заменить на реальные с Яндекс.Карт)

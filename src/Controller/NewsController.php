@@ -14,7 +14,8 @@ class NewsController
     public function index(): void
     {
         View::render('news', [
-            'title' => 'Новости',
+            'title' => 'Новости детейлинг-студии GRAND DETAILING, Туапсе',
+            'metaDescription' => 'Новости и полезные материалы о детейлинге в Туапсе: полировка, керамика, уход за кузовом и салоном от студии GRAND DETAILING.',
             'posts' => Post::published(),
         ]);
     }

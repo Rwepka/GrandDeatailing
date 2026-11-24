@@ -5,10 +5,15 @@
  * @var array<int, array<string, mixed>> $posts
  */
 $posts = $posts ?? [];
+$crumbs = [
+    ['label' => 'Новости'],
+];
 ?>
 <section class="section">
     <div class="container">
-        <h1>Новости</h1>
+        <?php require BASE_PATH . '/views/partials/breadcrumbs.php'; ?>
+        <h1>Новости детейлинг-студии</h1>
+        <p class="lead">Полезные материалы об уходе за автомобилем, полировке, керамике и сезонной защите кузова.</p>
 
         <?php if (empty($posts)): ?>
             <p>Новостей пока нет</p>

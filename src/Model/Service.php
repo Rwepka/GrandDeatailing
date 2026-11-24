@@ -39,12 +39,34 @@ class Service extends Model
     }
 
     /**
+     * Проверка уникальности slug (с исключением текущей услуги при редактировании).
+     */
+    public static function slugExists(string $slug, ?int $exceptId = null): bool
+    {
+        $sql = 'SELECT id FROM services WHERE slug = ?';
+        $params = [$slug];
+        if ($exceptId !== null) {
+            $sql .= ' AND id <> ?';
+            $params[] = $exceptId;
+        }
+        $sql .= ' LIMIT 1';
+
+        $stmt = Database::connection()->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchColumn() !== false;
+    }
+
+    /**
      * Создание услуги и возврат нового id.
      *
      * @param array{
      *     category_id: int,
      *     title: string,
      *     slug: string,
+     *     short_description?: string|null,
+     *     description?: string|null,
+     *     includes?: string|null,
+     *     process?: string|null,
      *     price_from?: float|null,
      *     duration_min?: int|null,
      *     image?: string|null,
@@ -54,14 +76,19 @@ class Service extends Model
     public static function create(array $data): int
     {
         $stmt = Database::connection()->prepare(
-            'INSERT INTO services (category_id, title, slug, price_from, duration_min, image, is_active)
-             VALUES (?, ?, ?, ?, ?, ?, ?)'
+            'INSERT INTO services
+                (category_id, title, slug, short_description, description, includes, process, price_from, duration_min, image, is_active)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
         );
 
         $stmt->execute([
             (int) $data['category_id'],
             $data['title'],
             $data['slug'],
+            $data['short_description'] ?? null,
+            $data['description'] ?? null,
+            $data['includes'] ?? null,
+            $data['process'] ?? null,
             $data['price_from'] ?? null,
             $data['duration_min'] ?? null,
             $data['image'] ?? null,
@@ -72,12 +99,16 @@ class Service extends Model
     }
 
     /**
-     * Обновление услуги (category_id, title, slug, price_from, duration_min).
+     * Обновление услуги.
      *
      * @param array{
      *     category_id: int,
      *     title: string,
      *     slug: string,
+     *     short_description?: string|null,
+     *     description?: string|null,
+     *     includes?: string|null,
+     *     process?: string|null,
      *     price_from?: float|null,
      *     duration_min?: int|null
      * } $data
@@ -85,13 +116,20 @@ class Service extends Model
     public static function update(int $id, array $data): void
     {
         $stmt = Database::connection()->prepare(
-            'UPDATE services SET category_id = ?, title = ?, slug = ?, price_from = ?, duration_min = ? WHERE id = ?'
+            'UPDATE services
+                SET category_id = ?, title = ?, slug = ?, short_description = ?, description = ?,
+                    includes = ?, process = ?, price_from = ?, duration_min = ?
+              WHERE id = ?'
         );
 
         $stmt->execute([
             (int) $data['category_id'],
             $data['title'],
             $data['slug'],
+            $data['short_description'] ?? null,
+            $data['description'] ?? null,
+            $data['includes'] ?? null,
+            $data['process'] ?? null,
             $data['price_from'] ?? null,
             $data['duration_min'] ?? null,
             $id,

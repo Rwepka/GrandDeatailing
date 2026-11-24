@@ -18,6 +18,7 @@ $crumbs = [
     <div class="container">
         <?php require BASE_PATH . '/views/partials/breadcrumbs.php'; ?>
         <h1>Контакты</h1>
+        <p class="lead">GRAND DETAILING — детейлинг-студия. Позвоните или оставьте сообщение: подскажем по услугам, срокам и стоимости.</p>
 
         <?php if ($flash !== null): ?>
             <div class="flash" role="status"><?= e($flash) ?></div>
@@ -35,9 +36,9 @@ $crumbs = [
         <?php endif; ?>
 
         <?php
-        $phone = (string) setting('phone', '+7 (988) 413-07-77');
+        $phone = (string) setting('phone', '+7 (988) 413-57-77');
         $telHref = (string) preg_replace('/\D+/', '', $phone);
-        $workHours = (string) setting('work_hours', 'Ежедневно с 9:00 до 20:00');
+        $workHours = (string) setting('work_hours', 'Ежедневно с 10:00 до 19:00');
         ?>
         <div class="card">
             <div class="field-group">
@@ -70,6 +71,11 @@ $crumbs = [
                     Показать карту
                 </button>
             </div>
+        </div>
+
+        <h2>Как нас найти</h2>
+        <div class="prose">
+            <p>Приезжайте на полировку, керамику, оклейку плёнкой, тонировку, химчистку салона или мойку — предварительная запись помогает закрепить время и мастера. Если не знаете, какая услуга нужна, позвоните — подскажем по телефону.</p>
         </div>
 
         <h2>Обратная связь</h2>

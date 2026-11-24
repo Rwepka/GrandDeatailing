@@ -321,6 +321,28 @@ function normalize_phone(string $phone): string
 }
 
 /**
+ * Многострочный текст → массив непустых строк (для списков «что входит», «этапы»).
+ *
+ * @return array<int, string>
+ */
+function text_lines(?string $text): array
+{
+    if ($text === null || trim($text) === '') {
+        return [];
+    }
+
+    $lines = preg_split('/\r\n|\r|\n/', trim($text)) ?: [];
+    $result = [];
+    foreach ($lines as $line) {
+        $line = trim($line);
+        if ($line !== '') {
+            $result[] = $line;
+        }
+    }
+    return $result;
+}
+
+/**
  * Классы автомобилей (для квиза записи и калькулятора).
  *
  * @return array<int, string>

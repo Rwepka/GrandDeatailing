@@ -9,6 +9,7 @@ use App\Model\AuditLog;
 use App\Model\Booking;
 use App\Model\BookingItem;
 use App\Model\Service;
+use App\Model\ServicePrice;
 use App\Model\User;
 
 class AdminController
@@ -162,9 +163,12 @@ class AdminController
     {
         requireStaff();
 
+        $services = Service::active();
+
         View::renderAdmin('booking_form', [
             'title' => 'Новая заявка',
-            'services' => Service::active(),
+            'services' => $services,
+            'servicePrices' => ServicePrice::mapForServices(array_column($services, 'id')),
             'carClasses' => self::CAR_CLASSES,
             'errors' => [],
             'old' => [],
@@ -181,6 +185,7 @@ class AdminController
         }
 
         $services = Service::active();
+        $servicePrices = ServicePrice::mapForServices(array_column($services, 'id'));
         $old = [
             'name' => trim((string) ($_POST['name'] ?? '')),
             'phone' => trim((string) ($_POST['phone'] ?? '')),
@@ -291,6 +296,7 @@ class AdminController
             View::renderAdmin('booking_form', [
                 'title' => 'Новая заявка',
                 'services' => $services,
+                'servicePrices' => $servicePrices,
                 'carClasses' => self::CAR_CLASSES,
                 'errors' => $errors,
                 'old' => $old,
@@ -314,7 +320,11 @@ class AdminController
 
             foreach ($serviceIds as $sid) {
                 $service = $activeById[$sid];
-                $rawPrice = $service['price_from'] ?? null;
+                // Цена зависит от выбранного мастером класса кузова, а не от «цены от».
+                $perBody = $servicePrices[$sid][$carClass] ?? null;
+                $rawPrice = ($perBody !== null && $perBody !== '')
+                    ? $perBody
+                    : ($service['price_from'] ?? null);
                 BookingItem::create([
                     'booking_id' => $bookingId,
                     'service_id' => $sid,
@@ -330,6 +340,7 @@ class AdminController
             View::renderAdmin('booking_form', [
                 'title' => 'Новая заявка',
                 'services' => $services,
+                'servicePrices' => $servicePrices,
                 'carClasses' => self::CAR_CLASSES,
                 'errors' => ['Не удалось сохранить заявку. Попробуйте ещё раз.'],
                 'old' => $old,

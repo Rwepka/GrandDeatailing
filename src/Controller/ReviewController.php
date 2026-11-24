@@ -14,7 +14,8 @@ class ReviewController
         $reviews = Review::published();
 
         View::render('reviews', [
-            'title' => 'Отзывы',
+            'title' => 'Отзывы о детейлинге в Туапсе — GRAND DETAILING',
+            'metaDescription' => 'Отзывы клиентов детейлинг-студии GRAND DETAILING в Туапсе: полировка, керамика, химчистка салона и защитная плёнка. Реальные оценки и впечатления.',
             'reviews' => $reviews,
         ]);
     }

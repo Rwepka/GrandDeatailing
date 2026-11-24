@@ -4,6 +4,9 @@
  */
 declare(strict_types=1);
 
+// Сайт работает по времени Туапсе/Москвы; серверный UTC не должен влиять на даты.
+date_default_timezone_set('Europe/Moscow');
+
 require_once BASE_PATH . '/src/helpers.php';
 
 // Режим отладки: в production (debug = false) не показываем детали ошибок пользователю,
