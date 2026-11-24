@@ -355,6 +355,6 @@ class CabinetController
         session_regenerate_id(true);
 
         setFlash('Пароль изменён. Теперь вы можете пользоваться кабинетом.');
-        redirect('/cabinet');
+        redirect(isAdmin() ? '/admin' : '/cabinet');
     }
 }

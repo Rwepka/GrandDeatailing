@@ -255,6 +255,10 @@ class AuthController
             redirect('/cabinet/security/password-change');
         }
 
+        if (isAdmin()) {
+            redirect('/admin');
+        }
+
         redirect(isMaster() ? '/admin/bookings' : '/cabinet');
     }
 
