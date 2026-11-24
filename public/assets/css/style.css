@@ -1386,11 +1386,17 @@ p + .btn,
 .booking-step h2:focus { outline: none; }
 
 @media (max-width: 1200px) {
+    .site-header:has(.header-menu.open) {
+        background: transparent;
+        -webkit-backdrop-filter: none;
+        backdrop-filter: none;
+    }
+
     .header-menu {
         background: linear-gradient(
             to bottom,
-            rgba(1, 1, 1, 0.55) 0%,
-            rgba(1, 1, 1, 0.55) calc(100% - 20px),
+            rgba(37, 38, 51, 0.9) 0%,
+            rgba(37, 38, 51, 0.9) calc(100% - 20px),
             rgba(1, 1, 1, 0) 100%
         );
         -webkit-backdrop-filter: none;
