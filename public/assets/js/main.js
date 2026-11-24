@@ -24,7 +24,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const open = menu.classList.toggle('open');
             toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
             toggle.setAttribute('aria-label', open ? 'Закрыть меню' : 'Открыть меню');
-            requestAnimationFrame(updateNavScrim);
+            // Синхронно, без rAF: иначе первый кадр меню успевает отрисоваться
+            // с прозрачным фоном до появления blur-слоя.
+            updateNavScrim();
         });
 
         window.addEventListener('resize', updateNavScrim);

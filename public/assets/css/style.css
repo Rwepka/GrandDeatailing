@@ -1431,7 +1431,8 @@ p + .btn,
     .nav-scrim.active {
         opacity: 1;
         visibility: visible;
-        transition: opacity 180ms ease;
+        /* Появление — мгновенно, чтобы не было кадра с прозрачным меню. */
+        transition: none;
     }
 }
 
