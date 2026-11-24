@@ -1584,3 +1584,9 @@ p + .btn,
     outline: 2px solid #93C5FD;
     outline-offset: 2px;
 }
+
+/* Прозрачные карточки в личном кабинете: подписи не должны наследовать тёмный цвет .card */
+.site-main .card.card-plain,
+.site-main .card.card-plain .field-group label {
+    color: #F1F5F9;
+}
