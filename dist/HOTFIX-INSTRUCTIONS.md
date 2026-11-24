@@ -1,7 +1,7 @@
 # GRAND DETAILING — hotfix последних мелких патчей
 
-**Пакет:** `C:\Users\Rwepka\dev\release\prod-hotfix-c619493-20261125-005541.zip`  
-**SHA256:** `6542c5b6816c332098511a6781c796f3870b6bfd28085c305c82d985790340fa`
+**Пакет:** `C:\Users\Rwepka\dev\release\prod-hotfix-d4772b9-20261125-005850.zip`  
+**SHA256:** `7971eea68dee721c3cb135f7d0ae7636293aa5d55d7e94f948ca242a3af2aa81`
 
 Большой патч уже выложен на production. В этом архиве только последние маленькие исправления.
 
@@ -12,7 +12,7 @@
 - `src/Controller/CabinetController.php` — после смены временного пароля админ тоже попадает в `/admin`;
 - `views/login.php` — стандартная синяя ссылка «Зарегистрироваться»;
 - `views/layout/header.php` и `public/assets/js/main.js` — слой размытия мобильного меню;
-- `public/assets/css/style.css` — плотный графитовый фон меню как в админке, без границы.
+- `public/assets/css/style.css` — glass-панель с параметрами `.admin-sidebar`: `rgba(1,1,1,.45)` + `blur(5px)`, без границы.
 
 В архиве 6 файлов. **SQL-миграции не нужны.**
 
