@@ -51,7 +51,7 @@ $old = $old ?? [];
                 <button type="submit" class="btn btn-accent">Войти</button>
             </form>
 
-            <p>Нет аккаунта? <a href="<?= e(url('/register')) ?>">Зарегистрироваться</a></p>
+            <p>Нет аккаунта? <a class="auth-link" href="<?= e(url('/register')) ?>">Зарегистрироваться</a></p>
         </div>
     </div>
 </section>

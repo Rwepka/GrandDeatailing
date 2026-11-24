@@ -1590,3 +1590,15 @@ p + .btn,
 .site-main .card.card-plain .field-group label {
     color: #F1F5F9;
 }
+
+/* Стандартная ссылка в карточке входа */
+.site-main .card a.auth-link {
+    color: var(--blue);
+}
+.auth-link:hover {
+    text-decoration: underline;
+}
+.auth-link:focus-visible {
+    outline: 2px solid #93C5FD;
+    outline-offset: 2px;
+}
