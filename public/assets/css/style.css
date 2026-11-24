@@ -1395,7 +1395,7 @@ p + .btn,
     .header-menu {
         /* Плотная графитовая поверхность как у sidebar в админке:
            сквозь неё не просвечивает светлый hero и не появляется серая муть. */
-        background: rgba(31, 35, 48, 0.92);
+        background: transparent;
         -webkit-backdrop-filter: none;
         backdrop-filter: none;
         border-bottom: 0;
@@ -1643,4 +1643,12 @@ p + .btn,
 .auth-link:focus-visible {
     outline: 2px solid #93C5FD;
     outline-offset: 2px;
+}
+/* Параметры glass-панели взяты один-в-один из .admin-sidebar / .admin-sidebar.expanded */
+.nav-scrim {
+    background: rgba(1, 1, 1, 0.45);
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
+    -webkit-mask-image: none;
+    mask-image: none;
 }
