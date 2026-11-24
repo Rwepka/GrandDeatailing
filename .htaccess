@@ -5,6 +5,11 @@ Options -Indexes
 
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    # Закрываем служебные каталоги от прямого доступа из браузера.
-    RewriteRule ^(src|config|views|database|storage)/ - [F,L]
+    # Закрываем служебные каталоги и файлы от прямого доступа из браузера.
+    RewriteRule ^(src|config|views|database|storage|scripts|docs)/ - [F,L]
+    RewriteRule ^(README\.md|TZ\.md|router\.php|start\.(sh|bat)|MANIFEST\.txt)$ - [F,L]
 </IfModule>
+
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
