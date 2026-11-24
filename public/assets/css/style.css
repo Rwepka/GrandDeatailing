@@ -1387,11 +1387,48 @@ p + .btn,
 
 @media (max-width: 1200px) {
     .header-menu {
-        background: rgba(1, 1, 1, 0.45);
-        -webkit-backdrop-filter: blur(5px);
-        backdrop-filter: blur(5px);
-        border-bottom: 1px solid #3a4150;
-        box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+        background: linear-gradient(
+            to bottom,
+            rgba(1, 1, 1, 0.55) 0%,
+            rgba(1, 1, 1, 0.55) calc(100% - 20px),
+            rgba(1, 1, 1, 0) 100%
+        );
+        -webkit-backdrop-filter: none;
+        backdrop-filter: none;
+        border-bottom: 0;
+        box-shadow: none;
+    }
+}
+
+/* Отдельный слой на уровне body: backdrop-filter внутри sticky-шапки
+   не размывает контент страницы, поэтому blur вынесен в fixed-слой. */
+.nav-scrim {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 0;
+    z-index: 9;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    -webkit-backdrop-filter: blur(14px) saturate(115%);
+    backdrop-filter: blur(14px) saturate(115%);
+    -webkit-mask-image: linear-gradient(to bottom, #000 0, #000 calc(100% - 20px), transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 0, #000 calc(100% - 20px), transparent 100%);
+    transition: opacity 180ms ease, visibility 0s linear 180ms;
+}
+
+@media (max-width: 1200px) {
+    .nav-scrim {
+        display: block;
+    }
+
+    .nav-scrim.active {
+        opacity: 1;
+        visibility: visible;
+        transition: opacity 180ms ease;
     }
 }
 

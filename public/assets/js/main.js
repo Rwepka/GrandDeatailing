@@ -4,13 +4,30 @@
 document.addEventListener('DOMContentLoaded', () => {
     const toggle = document.getElementById('nav-toggle');
     const menu = document.getElementById('header-menu');
+    const navScrim = document.getElementById('nav-scrim');
 
     if (toggle && menu) {
+        const updateNavScrim = () => {
+            if (!navScrim) {
+                return;
+            }
+            if (!menu.classList.contains('open') || window.innerWidth > 1200) {
+                navScrim.classList.remove('active');
+                navScrim.style.height = '0px';
+                return;
+            }
+            navScrim.style.height = menu.getBoundingClientRect().height + 'px';
+            navScrim.classList.add('active');
+        };
+
         toggle.addEventListener('click', () => {
             const open = menu.classList.toggle('open');
             toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
             toggle.setAttribute('aria-label', open ? 'Закрыть меню' : 'Открыть меню');
+            requestAnimationFrame(updateNavScrim);
         });
+
+        window.addEventListener('resize', updateNavScrim);
     }
 
     // Пошаговый квиз формы записи.

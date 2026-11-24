@@ -138,4 +138,5 @@ $noindex = str_starts_with($current, '/cabinet')
         </div>
     </div>
 </header>
+<div class="nav-scrim" id="nav-scrim" aria-hidden="true"></div>
 <main class="site-main" id="main" tabindex="-1">
